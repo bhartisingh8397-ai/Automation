@@ -1,0 +1,224 @@
+{
+  "health": {
+    "status_code": 200,
+    "data": {
+      "database": {
+        "connected": true,
+        "database": "digiauto_db",
+        "engine": "sqlite",
+        "fallback_to_sqlite": true,
+        "host": "localhost",
+        "message": "Using SQLite fallback (digiauto.db) - MySQL auth failed or not configured: (1045, \"Access denied for user 'root'@'localhost' (using password: YES)\")",
+        "port": 3306,
+        "user": "root"
+      },
+      "service": "Digigyapan Social Media Automation API",
+      "status": "healthy"
+    }
+  },
+  "clients": {
+    "status_code": 200,
+    "count": 7,
+    "sample": [
+      {
+        "business_type": "Healthcare & Multi-speciality Hospital",
+        "created_at": "2026-09-26T05:24:49.144482",
+        "id": 1,
+        "logo_url": null,
+        "name": "Keshav Hospital",
+        "social_accounts": [
+          {
+            "account_handle": "@keshavhospital",
+            "account_name": "Keshav Hospital",
+            "client_id": 1,
+            "created_at": "2026-09-26T05:24:49.205740",
+            "id": 1,
+            "is_connected": false,
+            "page_id": "fb_page_10982348",
+            "platform": "facebook"
+          },
+          {
+            "account_handle": "@keshav_hospital",
+            "account_name": "Keshav Hospital",
+            "client_id": 1,
+            "created_at": "2026-09-26T05:24:49.205740",
+            "id": 2,
+            "is_connected": true,
+            "page_id": "ig_act_904328",
+            "platform": "instagram"
+          },
+          {
+            "account_handle": "@keshavhospital",
+            "account_name": "Keshav Hospital Official",
+            "client_id": 1,
+            "created_at": "2026-09-26T05:24:49.205740",
+            "id": 3,
+            "is_connected": true,
+            "page_id": "yt_ch_872346",
+            "platform": "youtube"
+          },
+          {
+            "account_handle": "keshav-hospital-official",
+            "account_name": "Keshav Hospital",
+            "client_id": 1,
+            "created_at": "2026-09-26T05:24:49.205740",
+            "id": 4,
+            "is_connected": true,
+            "page_id": "li_org_389247",
+            "platform": "linkedin"
+          }
+        ]
+      },
+      {
+        "business_type": "Dental Clinic & Orthodontics",
+        "created_at": "2026-09-26T05:24:49.144482",
+        "id": 2,
+        "logo_url": null,
+        "name": "Roshni Dental",
+        "social_accounts": [
+          {
+            "account_handle": "@roshnidental",
+            "account_name": "Roshni Dental Clinic",
+            "client_id": 2,
+            "created_at": "2026-09-26T05:24:49.205740",
+            "id": 5,
+            "is_connected": true,
+            "page_id": "fb_page_20982341",
+            "platform": "facebook"
+          },
+          {
+            "account_handle": "@roshnidental_care",
+            "account_name": "Roshni Dental",
+            "client_id": 2,
+            "created_at": "2026-09-26T05:24:49.205740",
+            "id": 6,
+            "is_connected": true,
+            "page_id": "ig_act_204329",
+            "platform": "instagram"
+          },
+          {
+            "account_handle": "@roshnidental",
+            "account_name": "Roshni Dental",
+            "client_id": 2,
+            "created_at": "2026-09-26T05:24:49.205740",
+            "id": 7,
+            "is_connected": true,
+            "page_id": "yt_ch_272341",
+            "platform": "youtube"
+          },
+          {
+            "account_handle": "roshni-dental",
+            "account_name": "Roshni Dental Care",
+            "client_id": 2,
+            "created_at": "2026-09-26T05:24:49.205740",
+            "id": 8,
+            "is_connected": true,
+            "page_id": "li_org_289241",
+            "platform": "linkedin"
+          }
+        ]
+      }
+    ]
+  },
+  "posts": {
+    "status_code": 200,
+    "count": 1,
+    "sample": [
+      {
+        "caption_facebook": "खरखौदा में ब्लड बैंक की सुविधा अब और भी बेहतर! Keshav Hospital में सुरक्षित, आधुनिक और 24x7 ब्लड बैंक सेवा उपलब्ध है। सभी रक्त समूह 24 घंटे उपलब्ध रहते हैं। संपर्क करें: +91 98765 43210",
+        "caption_general": "खरखौदा में ब्लड बैंक की सुविधा अब और भी बेहतर! Keshav Hospital में सुरक्षित, आधुनिक और 24x7 ब्लड बैंक सेवा उपलब्ध है। आपातकालीन स्थिति में तुरंत रक्त उपलब्धता सुनिश्चित की जाती है।",
+        "caption_instagram": "खरखौदा में ब्लड बैंक की सुविधा अब और भी बेहतर! Keshav Hospital में सुरक्षित, आधुनिक और 24x7 ब्लड बैंक सेवा उपलब्ध है। 🩸\n\nआपातकालीन सहायता: +91 98765 43210\n#BloodBank #KeshavHospital #Kharkhoda #Healthcare #EmergencyCare",
+        "caption_linkedin": "Keshav Hospital is proud to announce expanded 24x7 advanced blood banking facilities in Kharkhoda, ensuring rapid response emergency care and life-saving critical support.",
+        "caption_twitter": null,
+        "caption_youtube": "खरखौदा में ब्लड बैंक की सुविधा | Keshav Hospital Kharkhoda 24x7 Blood Bank Facility\n\nEmergency helpline: +91 98765 43210\nWebsite: www.keshavhospital.com\nAddress: Kharkhoda, Sonipat, Haryana",
+        "client_id": 1,
+        "client_name": "Keshav Hospital",
+        "created_at": "2026-09-26T13:53:44.276554",
+        "duration_str": "2:15",
+        "file_size_mb": 85.0,
+        "hashtags": "#BloodBank #KeshavHospital #HealthCare #EmergencyCare #Kharkhoda",
+        "id": 1,
+        "overall_status": "Cancelled",
+        "platforms": [
+          {
+            "error_message": null,
+            "id": 1,
+            "platform": "instagram",
+            "platform_post_id": null,
+            "platform_post_url": null,
+            "post_id": 1,
+            "post_type": "Reel",
+            "published_at": null,
+            "status": "Pending"
+          },
+          {
+            "error_message": null,
+            "id": 2,
+            "platform": "facebook",
+            "platform_post_id": null,
+            "platform_post_url": null,
+            "post_id": 1,
+            "post_type": "Video/Reel",
+            "published_at": null,
+            "status": "Pending"
+          },
+          {
+            "error_message": null,
+            "id": 3,
+            "platform": "youtube",
+            "platform_post_id": null,
+            "platform_post_url": null,
+            "post_id": 1,
+            "post_type": "Video",
+            "published_at": null,
+            "status": "Pending"
+          },
+          {
+            "error_message": null,
+            "id": 4,
+            "platform": "linkedin",
+            "platform_post_id": null,
+            "platform_post_url": null,
+            "post_id": 1,
+            "post_type": "Video",
+            "published_at": null,
+            "status": "Pending"
+          }
+        ],
+        "schedule_type": "later",
+        "scheduled_at": "2026-09-27T19:30:00",
+        "thumbnail_url": null,
+        "timezone": "Asia/Kolkata (IST)",
+        "video_filename": "blood-bank.mp4",
+        "video_url": "/api/posts/media/blood-bank.mp4",
+        "youtube_title": "खरखौदा में ब्लड बैंक की सुविधा | Keshav Hospital Kharkhoda"
+      }
+    ]
+  },
+  "ai_generator": {
+    "status_code": 200,
+    "data": {
+      "caption_facebook": "प्रिय नागरिकों,\n\nTrauma Center & Intensive Care के संदर्भ में Keshav Hospital की विशेष पहल।\n\nआपकी और आपके परिवार की सेहत हमारी पहली प्राथमिकता!\nहमारे विशेषज्ञ आपको सही मार्गदर्शन और त्वरित सेवाएं प्रदान करने के लिए 24x7 तत्पर हैं।\n\nअपनी सेहत को नजरअंदाज न करें, आज ही विजिट करें।\n\n📍 पता: मुख्य केंद्र, शहर\n📞 संपर्क: +91 98765 43210",
+      "caption_general": "Trauma Center & Intensive Care अब Keshav Hospital में उपलब्ध!\n\nआपकी और आपके परिवार की सेहत हमारी पहली प्राथमिकता!\n\nहम प्रदान करते हैं उच्च गुणवत्ता, समर्पित देखभाल और आधुनिक सुविधाएं।\n\n👉 अपनी सेहत को नजरअंदाज न करें, आज ही विजिट करें।",
+      "caption_instagram": "✨ Trauma Center & Intensive Care ✨\n\nआपकी और आपके परिवार की सेहत हमारी पहली प्राथमिकता!\n\nKeshav Hospital में हम आपके अनुभव को सुरक्षित और उत्कृष्ट बनाने के लिए प्रतिबद्ध हैं। 💯\n\n📌 सेव करें यह रील और अपने दोस्तों के साथ शेयर करें!\n📞 अपनी सेहत को नजरअंदाज न करें, आज ही विजिट करें।\n\n#HealthCare #MedicalCare #DoctorConsultation #HealthTips #Wellness #HospitalCare #KeshavHospital",
+      "caption_linkedin": "Keshav Hospital continues to expand accessible and state-of-the-art services with the introduction of Trauma Center & Intensive Care.\n\nआपकी और आपके परिवार की सेहत हमारी पहली प्राथमिकता!\n\nOur commitment to operational excellence, clinical safety, and patient-first innovation drives our daily mission.\n\nKey Highlights:\n• Advanced Infrastructure & 24x7 Readiness\n• Certified Specialists\n• Seamless Patient Care Coordination\n\nअपनी सेहत को नजरअंदाज न करें, आज ही विजिट करें।\n\n#HealthCare #MedicalCare #DoctorConsultation #HealthTips #Wellness #HospitalCare #Leadership #HealthcareExcellence",
+      "caption_twitter": "🚨 Trauma Center & Intensive Care अब Keshav Hospital में उपलब्ध!\n\nआपकी और आपके परिवार की सेहत हमारी पहली प्राथमिकता!...\n\n👉 अपनी सेहत को नजरअंदाज न करें, आज ही विजिट करें।\n\n#HealthCare #KeshavHospital",
+      "caption_youtube": "Welcome to the official video presentation by Keshav Hospital.\n\nIn this video:\n- Trauma Center & Intensive Care overview\n- Modern facilities and safety measures\n- Expert consultation details\n\nआपकी और आपके परिवार की सेहत हमारी पहली प्राथमिकता!\nअपनी सेहत को नजरअंदाज न करें, आज ही विजिट करें।\n\nSubscribe to our channel for more regular updates!\n\nTimestamps:\n0:00 - Introduction\n0:30 - Key Highlights\n1:15 - How to Access Services\n\n#HealthCare #MedicalCare #DoctorConsultation #HealthTips #Wellness #HospitalCare",
+      "hashtags": "#HealthCare #MedicalCare #DoctorConsultation #HealthTips #Wellness #HospitalCare #KeshavHospital",
+      "hashtags_list": [
+        "#HealthCare",
+        "#MedicalCare",
+        "#DoctorConsultation",
+        "#HealthTips",
+        "#Wellness",
+        "#HospitalCare",
+        "#KeshavHospital"
+      ],
+      "youtube_title": "Trauma Center & Intensive Care | Keshav Hospital Complete Guide & Services"
+    }
+  },
+  "logs": {
+    "status_code": 200,
+    "count": 3
+  }
+}
