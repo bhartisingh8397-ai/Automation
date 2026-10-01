@@ -111,15 +111,16 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({
                 width: '32px',
                 height: '32px',
                 borderRadius: '8px',
-                backgroundColor: '#09090b',
+                background: 'linear-gradient(135deg, #833ab4 0%, #c13584 100%)',
                 color: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                boxShadow: '0 2px 8px rgba(193, 53, 132, 0.25)'
               }}>
                 <History size={16} />
               </div>
-              <h2 style={{ fontSize: '22px', fontWeight: '700', color: '#09090b', fontFamily: 'var(--font-serif)' }}>
+              <h2 style={{ fontSize: '22px', fontWeight: '700', color: 'var(--text-primary)', fontFamily: 'var(--font-serif)' }}>
                 Post History &amp; Delivery Records
               </h2>
             </div>
@@ -129,24 +130,6 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <button
-              type="button"
-              onClick={onSync}
-              className="btn btn-outline"
-              style={{
-                padding: '8px 14px',
-                fontSize: '12px',
-                gap: '6px',
-                backgroundColor: '#ffffff',
-                border: '1px solid #e4e4e7',
-                color: '#09090b'
-              }}
-              title="Sync latest posts from database"
-            >
-              <RefreshCw size={13} className={isSyncing ? 'animate-spin' : ''} />
-              <span>Sync Database</span>
-            </button>
-
             <button
               type="button"
               onClick={onCreateNewPost}
@@ -268,7 +251,7 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({
 
                   const platformKeys = post.platforms && post.platforms.length > 0
                     ? post.platforms.map(p => p.platform)
-                    : ['instagram', 'facebook', 'youtube', 'linkedin', 'twitter'];
+                    : ['instagram', 'facebook', 'youtube', 'linkedin'];
 
                   return (
                     <tr

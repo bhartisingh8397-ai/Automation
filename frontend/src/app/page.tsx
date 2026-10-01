@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Client, Post, AutomationLog, SocialPlatform, DatabaseInfo } from '../lib/types';
+import { Client, Post, AutomationLog, SocialPlatform, DatabaseInfo, SocialAccount } from '../lib/types';
 import { api } from '../lib/api';
 import { CLIENT_MEDIA_LIBRARY, ClientMediaItem } from '../lib/clientMedia';
 import { Sidebar } from '../components/Sidebar';
@@ -15,14 +15,16 @@ import { AnalyticsDashboard } from '../components/AnalyticsDashboard';
 import { ViewLinksModal } from '../components/ViewLinksModal';
 import { AddClientModal } from '../components/AddClientModal';
 import { PostSuccessModal } from '../components/PostSuccessModal';
-import { CheckCircle2 } from 'lucide-react';
+import { ManageAccountsModal } from '../components/ManageAccountsModal';
+import { CheckCircle2, Clock, Building2, ChevronDown, Sparkles, Layers, Plus, ChevronRight, ShieldCheck, Zap } from 'lucide-react';
 
 export default function Home() {
-  // Authentication & System State (Default to Login Page first as requested)
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Authentication & System State - Default to true with local session check
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [userEmail, setUserEmail] = useState('team@digigyapan.com');
   const [activeView, setActiveView] = useState<'create' | 'analytics' | 'history'>('create');
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const [currentTimeStr, setCurrentTimeStr] = useState<string>('Live IST');
   const [dbInfo, setDbInfo] = useState<DatabaseInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -48,8 +50,7 @@ export default function Home() {
     instagram: 'खरखौदा में ब्लड बैंक की सुविधा अब और भी बेहतर! Keshav Hospital में सुरक्षित, आधुनिक और 24x7 ब्लड बैंक सेवा उपलब्ध है। #BloodBank #KeshavHospital #Healthcare',
     facebook: 'खरखौदा में ब्लड बैंक की सुविधा अब और भी बेहतर! Keshav Hospital में सुरक्षित, आधुनिक और 24x7 ब्लड बैंक सेवा उपलब्ध है...',
     youtube: 'खरखौदा में ब्लड बैंक की सुविधा | Keshav Hospital Kharkhoda 24x7 Blood Bank Facility\n\nEmergency helpline: +91 98765 43210\nWebsite: www.keshavhospital.com',
-    linkedin: 'Keshav Hospital is proud to announce expanded 24x7 advanced blood banking facilities in Kharkhoda, ensuring rapid response emergency care.',
-    twitter: 'खरखौदा में ब्लड बैंक की सुविधा अब और भी बेहतर! Keshav Hospital में 24x7 सुरक्षित ब्लड बैंक सेवा उपलब्ध है। 🏥✨ #BloodBank #KeshavHospital'
+    linkedin: 'Keshav Hospital is proud to announce expanded 24x7 advanced blood banking facilities in Kharkhoda, ensuring rapid response emergency care.'
   });
 
   const [youtubeTitle, setYoutubeTitle] = useState('खरखौदा में ब्लड बैंक की सुविधा | Keshav Hospital');
@@ -60,8 +61,7 @@ export default function Home() {
     'instagram',
     'facebook',
     'youtube',
-    'linkedin',
-    'twitter'
+    'linkedin'
   ]);
 
   // Step 5 Schedule Controls
@@ -77,14 +77,32 @@ export default function Home() {
   const [isAddClientOpen, setIsAddClientOpen] = useState(false);
   const [successPostModal, setSuccessPostModal] = useState<Post | null>(null);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isManageAccountsOpen, setIsManageAccountsOpen] = useState(false);
 
-  // Initial Data Fetch - Always show Login Page first
+  // Initial Data Fetch & Session Restore
   useEffect(() => {
-    setIsLoggedIn(false);
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('digiauto_logged_in');
+      const stored = localStorage.getItem('digiauto_logged_in');
+      if (stored === 'false') {
+        setIsLoggedIn(false);
+      } else {
+        setIsLoggedIn(true);
+      }
     }
     loadAllData();
+  }, []);
+
+  // Real-time IST clock update
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const time = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+      const date = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+      setCurrentTimeStr(`${date}, ${time} IST`);
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const showToast = (msg: string) => {
@@ -124,7 +142,7 @@ export default function Home() {
         setSelectedClientId(firstClient.id);
         applyClientInitialMedia(firstClient.id);
       } else {
-        // Fallback default clients
+        // Fallback default clients with distinct accounts per client
         const defaultClientsList: Client[] = [
           {
             id: 1,
@@ -134,8 +152,7 @@ export default function Home() {
               { id: 1, client_id: 1, platform: 'facebook', account_name: 'Keshav Hospital', account_handle: '@keshavhospital', is_connected: true },
               { id: 2, client_id: 1, platform: 'instagram', account_name: 'Keshav Hospital', account_handle: '@keshav_hospital', is_connected: true },
               { id: 3, client_id: 1, platform: 'youtube', account_name: 'Keshav Official', account_handle: '@keshavhospital', is_connected: true },
-              { id: 4, client_id: 1, platform: 'linkedin', account_name: 'Keshav Hospital', account_handle: 'keshav-hospital', is_connected: true },
-              { id: 101, client_id: 1, platform: 'twitter', account_name: 'Keshav Hospital on X', account_handle: '@keshavhospital', is_connected: true }
+              { id: 4, client_id: 1, platform: 'linkedin', account_name: 'Keshav Hospital', account_handle: 'keshav-hospital', is_connected: true }
             ]
           },
           {
@@ -143,11 +160,8 @@ export default function Home() {
             name: 'Roshni Dental',
             business_type: 'Dental Clinic & Orthodontics',
             social_accounts: [
-              { id: 5, client_id: 2, platform: 'facebook', account_name: 'Roshni Dental Clinic', account_handle: '@roshnidental', is_connected: true },
-              { id: 6, client_id: 2, platform: 'instagram', account_name: 'Roshni Dental', account_handle: '@roshnidental_care', is_connected: true },
-              { id: 7, client_id: 2, platform: 'youtube', account_name: 'Roshni Dental Care', account_handle: '@roshnidental', is_connected: true },
-              { id: 8, client_id: 2, platform: 'linkedin', account_name: 'Roshni Dental', account_handle: 'roshni-dental', is_connected: true },
-              { id: 102, client_id: 2, platform: 'twitter', account_name: 'Roshni Dental Care', account_handle: '@roshnidental', is_connected: true }
+              { id: 5, client_id: 2, platform: 'instagram', account_name: 'Roshni Dental', account_handle: '@roshnidental_care', is_connected: true },
+              { id: 6, client_id: 2, platform: 'facebook', account_name: 'Roshni Dental Clinic', account_handle: '@roshnidental', is_connected: true }
             ]
           },
           {
@@ -155,11 +169,9 @@ export default function Home() {
             name: 'Noble Hospital',
             business_type: 'General Hospital & Diagnostics',
             social_accounts: [
-              { id: 9, client_id: 3, platform: 'facebook', account_name: 'Noble Hospital', account_handle: '@noblehospital', is_connected: true },
-              { id: 10, client_id: 3, platform: 'instagram', account_name: 'Noble Hospital', account_handle: '@noble_hospital', is_connected: true },
-              { id: 11, client_id: 3, platform: 'youtube', account_name: 'Noble Healthcare', account_handle: '@noblehospital', is_connected: true },
-              { id: 12, client_id: 3, platform: 'linkedin', account_name: 'Noble Hospital', account_handle: 'noble-hospital', is_connected: true },
-              { id: 103, client_id: 3, platform: 'twitter', account_name: 'Noble Hospital on X', account_handle: '@noblehospital', is_connected: true }
+              { id: 7, client_id: 3, platform: 'youtube', account_name: 'Noble Healthcare', account_handle: '@noblehospital', is_connected: true },
+              { id: 8, client_id: 3, platform: 'facebook', account_name: 'Noble Hospital', account_handle: '@noblehospital', is_connected: true },
+              { id: 9, client_id: 3, platform: 'linkedin', account_name: 'Noble Hospital', account_handle: 'noble-hospital', is_connected: true }
             ]
           },
           {
@@ -167,17 +179,18 @@ export default function Home() {
             name: 'Dermatrixx',
             business_type: 'Skin & Hair Aesthetic Clinic',
             social_accounts: [
-              { id: 13, client_id: 4, platform: 'facebook', account_name: 'Dermatrixx Skin Clinic', account_handle: '@dermatrixx', is_connected: true },
-              { id: 14, client_id: 4, platform: 'instagram', account_name: 'Dermatrixx Skin', account_handle: '@dermatrixx_skin', is_connected: true },
-              { id: 15, client_id: 4, platform: 'youtube', account_name: 'Dermatrixx Aesthetics', account_handle: '@dermatrixx', is_connected: true },
-              { id: 16, client_id: 4, platform: 'linkedin', account_name: 'Dermatrixx Aesthetics', account_handle: 'dermatrixx-clinic', is_connected: true },
-              { id: 104, client_id: 4, platform: 'twitter', account_name: 'Dermatrixx Clinic', account_handle: '@dermatrixx', is_connected: true }
+              { id: 10, client_id: 4, platform: 'instagram', account_name: 'Dermatrixx Skin', account_handle: '@dermatrixx_skin', is_connected: true }
             ]
           }
         ];
         setClients(defaultClientsList);
         setSelectedClientId(1);
         applyClientInitialMedia(1);
+        if (defaultClientsList[0]?.social_accounts) {
+          setSelectedPlatforms(
+            defaultClientsList[0].social_accounts.map(a => a.platform.toLowerCase() as SocialPlatform)
+          );
+        }
       }
 
       if (postsRes && postsRes.length > 0) {
@@ -204,14 +217,12 @@ export default function Home() {
       setFileSizeMb(firstMedia.fileSizeMb);
       setDurationStr(firstMedia.durationStr);
       if (firstMedia.captions) {
-        const defaultTw = firstMedia.captions.twitter || (firstMedia.captions.general.length > 250 ? firstMedia.captions.general.slice(0, 240) + '...' : firstMedia.captions.general);
         setCaptions({
           general: firstMedia.captions.general,
           instagram: firstMedia.captions.instagram,
           facebook: firstMedia.captions.facebook,
           youtube: firstMedia.captions.youtube,
-          linkedin: firstMedia.captions.linkedin,
-          twitter: defaultTw
+          linkedin: firstMedia.captions.linkedin
         });
         setYoutubeTitle(firstMedia.captions.youtubeTitle);
         setHashtags(firstMedia.captions.hashtags);
@@ -224,6 +235,15 @@ export default function Home() {
     setSelectedClientId(id);
     applyClientInitialMedia(id);
     const targetClient = clients.find(c => c.id === id);
+    if (targetClient && targetClient.social_accounts && targetClient.social_accounts.length > 0) {
+      const valid = targetClient.social_accounts
+        .filter(a => a.is_connected !== false)
+        .map(a => a.platform.toLowerCase() as SocialPlatform)
+        .filter(p => ['instagram', 'facebook', 'youtube', 'linkedin'].includes(p));
+      if (valid.length > 0) {
+        setSelectedPlatforms(valid);
+      }
+    }
     showToast(`Switched to client: ${targetClient?.name || 'Selected Client'}`);
   };
 
@@ -237,14 +257,12 @@ export default function Home() {
     setFileSizeMb(item.fileSizeMb);
     setDurationStr(item.durationStr);
     if (item.captions) {
-      const defaultTw = item.captions.twitter || (item.captions.general.length > 250 ? item.captions.general.slice(0, 240) + '...' : item.captions.general);
       setCaptions({
         general: item.captions.general,
         instagram: item.captions.instagram,
         facebook: item.captions.facebook,
         youtube: item.captions.youtube,
-        linkedin: item.captions.linkedin,
-        twitter: defaultTw
+        linkedin: item.captions.linkedin
       });
       setYoutubeTitle(item.captions.youtubeTitle);
       setHashtags(item.captions.hashtags);
@@ -308,8 +326,7 @@ export default function Home() {
           instagram: aiData.caption_instagram,
           facebook: aiData.caption_facebook,
           youtube: aiData.caption_youtube,
-          linkedin: aiData.caption_linkedin,
-          twitter: aiData.caption_twitter || aiData.caption_general
+          linkedin: aiData.caption_linkedin
         });
         setYoutubeTitle(aiData.youtube_title);
         setHashtags(aiData.hashtags);
@@ -334,11 +351,25 @@ export default function Home() {
   };
 
   const handleSelectAllPlatforms = () => {
-    setSelectedPlatforms(['instagram', 'facebook', 'youtube', 'linkedin', 'twitter']);
+    const currentClient = clients.find(c => c.id === selectedClientId);
+    if (currentClient && currentClient.social_accounts && currentClient.social_accounts.length > 0) {
+      const valid = currentClient.social_accounts
+        .map(a => a.platform.toLowerCase() as SocialPlatform)
+        .filter(p => ['instagram', 'facebook', 'youtube', 'linkedin'].includes(p));
+      setSelectedPlatforms(valid);
+    } else {
+      setSelectedPlatforms(['instagram']);
+    }
   };
 
   const handleClearAllPlatforms = () => {
-    setSelectedPlatforms(['instagram']);
+    const currentClient = clients.find(c => c.id === selectedClientId);
+    if (currentClient && currentClient.social_accounts && currentClient.social_accounts.length > 0) {
+      const first = currentClient.social_accounts[0].platform.toLowerCase() as SocialPlatform;
+      setSelectedPlatforms([first]);
+    } else {
+      setSelectedPlatforms(['instagram']);
+    }
   };
 
   // Toggle Account Connection
@@ -369,38 +400,64 @@ export default function Home() {
   const handleAddClient = async (
     name: string,
     businessType: string,
-    socialLinks?: { facebook?: string; instagram?: string; youtube?: string; linkedin?: string; twitter?: string }
+    socialLinks?: { facebook?: string; instagram?: string; youtube?: string; linkedin?: string }
   ) => {
     try {
       const newClient = await api.createClient(name, businessType, socialLinks);
       setClients(prev => [...prev, newClient]);
       setSelectedClientId(newClient.id);
+      applyClientInitialMedia(newClient.id);
+      if (newClient.social_accounts && newClient.social_accounts.length > 0) {
+        setSelectedPlatforms(newClient.social_accounts.map(a => a.platform.toLowerCase() as SocialPlatform));
+      }
       showToast(`Client '${name}' added with connected social channels!`);
     } catch {
-      const slug = name.toLowerCase().replace(/\s+/g, '');
-      const fbHandle = socialLinks?.facebook?.trim() || `@${slug}`;
-      const igHandle = socialLinks?.instagram?.trim() || `@${slug}`;
-      const ytHandle = socialLinks?.youtube?.trim() || `@${slug}`;
-      const liHandle = socialLinks?.linkedin?.trim() || `${slug}-official`;
-      const twHandle = socialLinks?.twitter?.trim() || `@${slug}`;
-
+      const accounts: SocialAccount[] = [];
+      let accId = 1;
       const newId = Date.now();
+
+      if (socialLinks?.facebook && socialLinks.facebook.trim()) {
+        accounts.push({ id: newId + accId++, client_id: newId, platform: 'facebook' as SocialPlatform, account_name: `${name} Page`, account_handle: socialLinks.facebook.trim(), is_connected: true });
+      }
+      if (socialLinks?.instagram && socialLinks.instagram.trim()) {
+        accounts.push({ id: newId + accId++, client_id: newId, platform: 'instagram' as SocialPlatform, account_name: `${name} Official`, account_handle: socialLinks.instagram.trim(), is_connected: true });
+      }
+      if (socialLinks?.youtube && socialLinks.youtube.trim()) {
+        accounts.push({ id: newId + accId++, client_id: newId, platform: 'youtube' as SocialPlatform, account_name: `${name} Channel`, account_handle: socialLinks.youtube.trim(), is_connected: true });
+      }
+      if (socialLinks?.linkedin && socialLinks.linkedin.trim()) {
+        accounts.push({ id: newId + accId++, client_id: newId, platform: 'linkedin' as SocialPlatform, account_name: name, account_handle: socialLinks.linkedin.trim(), is_connected: true });
+      }
+
       const mockClient: Client = {
         id: newId,
         name,
         business_type: businessType,
-        social_accounts: [
-          { id: newId + 1, client_id: newId, platform: 'facebook', account_name: `${name} Page`, account_handle: fbHandle, is_connected: true },
-          { id: newId + 2, client_id: newId, platform: 'instagram', account_name: `${name} Official`, account_handle: igHandle, is_connected: true },
-          { id: newId + 3, client_id: newId, platform: 'youtube', account_name: `${name} Channel`, account_handle: ytHandle, is_connected: true },
-          { id: newId + 4, client_id: newId, platform: 'linkedin', account_name: name, account_handle: liHandle, is_connected: true },
-          { id: newId + 5, client_id: newId, platform: 'twitter', account_name: `${name} on X`, account_handle: twHandle, is_connected: true },
-        ]
+        social_accounts: accounts
       };
       setClients(prev => [...prev, mockClient]);
       setSelectedClientId(mockClient.id);
-      showToast(`Client '${name}' added with connected social channels!`);
+      applyClientInitialMedia(mockClient.id);
+      if (accounts.length > 0) {
+        setSelectedPlatforms(accounts.map(a => a.platform.toLowerCase() as SocialPlatform));
+      }
+      showToast(`Client '${name}' added with ${accounts.length} connected channel${accounts.length === 1 ? '' : 's'}!`);
     }
+  };
+
+  // Manage / Update Social Media Accounts for Existing Client
+  const handleAccountsUpdated = (updatedClient: Client) => {
+    setClients(prev => prev.map(c => c.id === updatedClient.id ? updatedClient : c));
+    if (updatedClient.social_accounts && updatedClient.social_accounts.length > 0) {
+      const activePlatforms = updatedClient.social_accounts
+        .filter(a => a.is_connected !== false)
+        .map(a => a.platform.toLowerCase() as SocialPlatform)
+        .filter(p => ['instagram', 'facebook', 'youtube', 'linkedin'].includes(p));
+      if (activePlatforms.length > 0) {
+        setSelectedPlatforms(activePlatforms);
+      }
+    }
+    showToast(`Updated social accounts for ${updatedClient.name}!`);
   };
 
   // Submit Post
@@ -435,7 +492,6 @@ export default function Home() {
       caption_facebook: captions.facebook,
       caption_youtube: captions.youtube,
       caption_linkedin: captions.linkedin,
-      caption_twitter: captions.twitter,
       youtube_title: youtubeTitle,
       hashtags: hashtags,
       schedule_type: scheduleType,
@@ -495,7 +551,6 @@ export default function Home() {
         caption_facebook: captions.facebook,
         caption_youtube: captions.youtube,
         caption_linkedin: captions.linkedin,
-        caption_twitter: captions.twitter,
         youtube_title: youtubeTitle,
         hashtags: hashtags,
         schedule_type: scheduleType,
@@ -506,17 +561,15 @@ export default function Home() {
           id: Date.now() + idx,
           post_id: Date.now(),
           platform: plat,
-          post_type: plat === 'instagram' ? 'Reel' : (plat === 'twitter' ? 'Video Tweet' : 'Video'),
+          post_type: plat === 'instagram' ? 'Reel' : 'Video',
           status: (scheduleType === 'now' ? 'Published' : 'Pending') as 'Pending' | 'Published' | 'Failed',
-          platform_post_url: plat === 'twitter'
-            ? `https://x.com/${clientName.toLowerCase().replace(/\s+/g, '')}/status/189${Math.floor(100000 + Math.random() * 900000)}`
-            : (plat === 'instagram'
-              ? `https://instagram.com/reel/C89218x${clientName.slice(0, 6)}`
-              : (plat === 'facebook'
-                ? `https://facebook.com/${clientName.toLowerCase().replace(/\s+/g, '')}/videos/5419827`
-                : (plat === 'youtube'
-                  ? `https://youtube.com/watch?v=yt_K8h92_1v`
-                  : `https://linkedin.com/feed/update/urn:li:activity:891724`)))
+          platform_post_url: plat === 'instagram'
+            ? `https://instagram.com/reel/C89218x${clientName.slice(0, 6)}`
+            : (plat === 'facebook'
+              ? `https://facebook.com/${clientName.toLowerCase().replace(/\s+/g, '')}/videos/5419827`
+              : (plat === 'youtube'
+                ? `https://youtube.com/watch?v=wJINj8w85JA`
+                : `https://linkedin.com/feed/update/urn:li:activity:891724`))
         }))
       };
       setPosts(prev => [fallbackPost, ...prev]);
@@ -564,13 +617,16 @@ export default function Home() {
   const handleLoginSuccess = (email: string) => {
     setIsLoggedIn(true);
     setUserEmail(email);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('digiauto_logged_in', 'true');
+    }
     showToast(`Logged in successfully as ${email}`);
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('digiauto_logged_in');
+      localStorage.setItem('digiauto_logged_in', 'false');
     }
     showToast('Signed out of dashboard.');
   };
@@ -589,11 +645,14 @@ export default function Home() {
     );
   }
 
-  // =========================================================================
-  // VIEW 2: FULL AUTOMATION DASHBOARD (Once user logs in)
-  // =========================================================================
+  // Summary metrics for executive Stat Rail (Sudvin Editorial Style)
+  const totalClientsCount = clients.length;
+  const totalConnectedAccounts = clients.reduce((acc, c) => acc + (c.social_accounts?.length || 0), 0);
+  const publishedCount = posts.filter(p => p.overall_status === 'Published').length;
+  const scheduledCount = posts.filter(p => p.overall_status === 'Scheduled').length;
+
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#ffffff', color: '#09090b' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       
       {/* Toast Notification */}
       {toastMessage && (
@@ -601,11 +660,12 @@ export default function Home() {
           position: 'fixed',
           bottom: '24px',
           right: '24px',
-          background: '#09090b',
+          background: 'linear-gradient(135deg, #833ab4 0%, #c13584 50%, #e1306c 100%)',
           color: '#ffffff',
           padding: '12px 20px',
-          borderRadius: '8px',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+          borderRadius: '10px',
+          border: '1px solid rgba(253, 29, 29, 0.4)',
+          boxShadow: '0 10px 30px rgba(131, 58, 180, 0.28)',
           zIndex: 9999,
           display: 'flex',
           alignItems: 'center',
@@ -613,7 +673,7 @@ export default function Home() {
           fontSize: '13px',
           fontWeight: '600'
         }}>
-          <CheckCircle2 size={16} color="#ffffff" />
+          <CheckCircle2 size={16} color="#ffdc80" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -632,70 +692,229 @@ export default function Home() {
         currentStep={currentStep}
         onStepChange={(step) => setCurrentStep(step)}
         selectedClientName={currentClient?.name}
+        selectedClientAccounts={currentClient?.social_accounts}
       />
 
       {/* Main Workspace */}
-      <main style={{ flex: 1, minWidth: 0, padding: '30px 40px 80px', overflowY: 'auto' }}>
+      <main style={{ flex: 1, minWidth: 0, padding: '30px 40px 80px', overflowY: 'auto', background: 'var(--bg-primary)' }}>
         <div style={{ maxWidth: '1360px', margin: '0 auto' }}>
           
           {/* Top Workspace Header Bar */}
           <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingBottom: '20px',
+            background: '#ffffff',
+            borderRadius: '16px',
+            border: '1px solid var(--border-default)',
+            padding: '20px 24px',
             marginBottom: '24px',
-            borderBottom: '1px solid #f4f4f5',
-            flexWrap: 'wrap',
-            gap: '16px'
+            boxShadow: '0 2px 8px rgba(131, 58, 180, 0.04)'
           }}>
-            <div>
-              <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#09090b', margin: 0, fontFamily: 'var(--font-serif)', letterSpacing: '-0.02em' }}>
-                {activeView === 'create'
-                  ? 'Create & Schedule Campaign'
-                  : (activeView === 'analytics' ? 'Performance Analytics & Metrics' : 'Published Post History')}
-              </h2>
-              <p style={{ fontSize: '13px', color: '#71717a', margin: '4px 0 0 0' }}>
-                {activeView === 'create' 
-                  ? `Active Client: ${currentClient?.name || 'Selected Client'} • 5 Connected Platforms (Instagram, Twitter/X, YouTube, Facebook, LinkedIn)`
-                  : (activeView === 'analytics'
-                    ? `Live metrics on Likes, Comments, Shares, and Video Reach across social networks`
-                    : `Comprehensive record of automated postings, video previews, schedule timings, and direct post links`)}
-              </p>
-            </div>
+            {/* Command Bar Top Row: Breadcrumb + System Badges + Action Buttons */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingBottom: '16px',
+              borderBottom: '1px solid var(--border-subtle)',
+              marginBottom: '16px',
+              flexWrap: 'wrap',
+              gap: '12px'
+            }}>
+              {/* Left: Breadcrumbs */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--text-muted)' }}>
+                <span style={{ fontWeight: '700', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <Sparkles size={14} /> Digigyapan AI
+                </span>
+                <ChevronRight size={13} color="var(--border-strong)" />
+                <span style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>
+                  {currentClient?.name || 'Client Hub'}
+                </span>
+                <ChevronRight size={13} color="var(--border-strong)" />
+                <span style={{
+                  fontWeight: '700',
+                  color: 'var(--accent-secondary)',
+                  background: 'var(--rust-50)',
+                  padding: '2px 8px',
+                  borderRadius: '6px',
+                  border: '1px solid var(--rust-100)'
+                }}>
+                  {activeView === 'create' ? `Campaign Studio • Step ${currentStep}/4` : (activeView === 'analytics' ? 'Analytics Studio' : 'Campaign Archive')}
+                </span>
+              </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 12px',
-                borderRadius: '9999px',
-                background: '#f4f4f5',
-                border: '1px solid #e4e4e7',
-                fontSize: '11px',
-                fontWeight: '600',
-                color: '#27272a'
-              }}>
-                <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#16a34a' }}></span>
-                <span>System Online • Auto Scheduler Active</span>
+              {/* Right: Quick Action Controls */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                {/* Quick Client Switcher Dropdown */}
+                {clients.length > 0 && (
+                  <div style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '7px',
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-default)',
+                    fontSize: '12px'
+                  }}>
+                    <Building2 size={14} color="#c13584" />
+                    <select
+                      value={selectedClientId}
+                      onChange={(e) => handleSelectClient(Number(e.target.value))}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        fontSize: '12px',
+                        color: 'var(--text-primary)',
+                        cursor: 'pointer',
+                        fontWeight: '600',
+                        outline: 'none'
+                      }}
+                      title="Switch active client organization"
+                    >
+                      {clients.map(c => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Live IST Clock */}
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 12px',
+                  borderRadius: '8px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-default)',
+                  fontSize: '11.5px',
+                  fontWeight: '600',
+                  color: 'var(--text-secondary)'
+                }}>
+                  <Clock size={12} color="#c13584" />
+                  <span>{currentTimeStr}</span>
+                </div>
+
+                {/* New Campaign Action Button */}
+                {activeView !== 'create' ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveView('create');
+                      setCurrentStep(1);
+                    }}
+                    className="btn btn-primary"
+                    style={{ padding: '6px 14px', fontSize: '12px', gap: '6px' }}
+                  >
+                    <Plus size={14} /> New Campaign
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setIsAddClientOpen(true)}
+                    className="btn btn-secondary"
+                    style={{ padding: '6px 12px', fontSize: '12px', gap: '6px' }}
+                  >
+                    <Plus size={13} /> Add Client
+                  </button>
+                )}
               </div>
             </div>
+
+            {/* Title & Client Status Row */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '16px'
+            }}>
+              <div>
+                <h1 style={{ fontSize: '24px', fontWeight: '800', fontFamily: 'var(--font-headings)', color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.025em', lineHeight: 1.2 }}>
+                  {activeView === 'create'
+                    ? 'Multi-Channel Campaign Studio'
+                    : (activeView === 'analytics' ? 'Performance Analytics & Reach Studio' : 'Campaign Archive & Publication History')}
+                </h1>
+                <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: '5px 0 0 0', lineHeight: 1.5 }}>
+                  {activeView === 'create'
+                    ? `Publish high-resolution Reels, Shorts, and Feed updates for ${currentClient?.name || 'Selected Client'} with AI captions & hashtags.`
+                    : (activeView === 'analytics'
+                      ? `Real-time analytics across Instagram, YouTube, Facebook, and LinkedIn for ${currentClient?.name || 'all clients'}.`
+                      : `Comprehensive history of scheduled, published, and queued posts with live web verification links.`)}
+                </p>
+              </div>
+
+              {/* Connected Accounts Quick Chips */}
+              {activeView === 'create' && currentClient?.social_accounts && currentClient.social_accounts.length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: 'var(--text-dim)', letterSpacing: '0.04em' }}>
+                    Active Channels:
+                  </span>
+                  {currentClient.social_accounts.map(acc => (
+                    <div
+                      key={acc.platform}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        background: 'var(--rust-50)',
+                        border: '1px solid var(--rust-100)',
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        color: 'var(--text-secondary)'
+                      }}
+                    >
+                      <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#c13584' }} />
+                      <span style={{ textTransform: 'capitalize' }}>{acc.platform}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        
+
         {/* VIEW A: ANALYTICS DASHBOARD */}
         {activeView === 'analytics' ? (
-          <AnalyticsDashboard
-            posts={posts}
-            clients={clients}
-            onViewLinks={(post) => setViewPostModal(post)}
-            onSync={loadAllData}
-            isSyncing={isLoading}
-            onNavigateToCreate={() => {
-              setActiveView('create');
-              setCurrentStep(1);
-            }}
-          />
+          <div>
+            {/* Executive Stat Rail (Sudvin Editorial Style) */}
+            <div className="stat-rail">
+              <div>
+                <span className="stat-num">{totalClientsCount}</span>
+                <span className="stat-label">Active Clients</span>
+                <span className="stat-sub">Managed Organizations</span>
+              </div>
+              <div>
+                <span className="stat-num">{totalConnectedAccounts}</span>
+                <span className="stat-label">Connected Channels</span>
+                <span className="stat-sub">Meta, YouTube &amp; LinkedIn</span>
+              </div>
+              <div>
+                <span className="stat-num">{publishedCount}</span>
+                <span className="stat-label">Published Posts</span>
+                <span className="stat-sub">Automated Dispatches</span>
+              </div>
+              <div>
+                <span className="stat-num">{scheduledCount}</span>
+                <span className="stat-label">Scheduled in Queue</span>
+                <span className="stat-sub">Cron Daemon Active</span>
+              </div>
+            </div>
+
+            <AnalyticsDashboard
+              posts={posts}
+              clients={clients}
+              onViewLinks={(post) => setViewPostModal(post)}
+              onSync={loadAllData}
+              isSyncing={isLoading}
+              onNavigateToCreate={() => {
+                setActiveView('create');
+                setCurrentStep(1);
+              }}
+            />
+          </div>
         ) : activeView === 'history' ? (
           /* VIEW B: DEDICATED POST HISTORY PAGE */
           <HistoryPage
@@ -716,56 +935,118 @@ export default function Home() {
           /* VIEW C: 4-STEP CREATE POST WIZARD */
           <>
             {/* Step-by-Step Wizard Track Bar */}
-            <div className="wizard-steps-track">
-              
-              {/* Step 1 Pill */}
-              <div
-                className={`wizard-step-item ${currentStep === 1 ? 'active' : (currentStep > 1 ? 'completed' : '')}`}
-                onClick={() => setCurrentStep(1)}
-              >
-                <div className="wizard-step-circle">1</div>
-                <div>
-                  <div style={{ fontSize: '13px', lineHeight: '1.2' }}>Select Client</div>
-                  <div style={{ fontSize: '11px', opacity: 0.75 }}>&amp; Connected Socials</div>
+            <div style={{
+              background: '#ffffff',
+              borderRadius: '16px',
+              border: '1px solid var(--border-default)',
+              padding: '12px 16px',
+              marginBottom: '24px',
+              boxShadow: '0 2px 8px rgba(131, 58, 180, 0.04)'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                overflowX: 'auto',
+                paddingBottom: '4px'
+              }}>
+                {/* Step 1 */}
+                <div
+                  className={`wizard-step-item ${currentStep === 1 ? 'active' : (currentStep > 1 ? 'completed' : '')}`}
+                  onClick={() => setCurrentStep(1)}
+                  style={{ flex: 1, minWidth: '200px' }}
+                >
+                  <div className="wizard-step-circle">
+                    {currentStep > 1 ? '✓' : 1}
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: '13px', fontWeight: '700', lineHeight: '1.2', color: currentStep === 1 ? '#c13584' : 'inherit' }}>
+                      1. Select Client
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '2px' }}>
+                      {currentClient?.name || 'Pick organization'}
+                    </div>
+                  </div>
+                </div>
+
+                <ChevronRight size={16} color="var(--border-strong)" style={{ flexShrink: 0 }} />
+
+                {/* Step 2 */}
+                <div
+                  className={`wizard-step-item ${currentStep === 2 ? 'active' : (currentStep > 2 ? 'completed' : '')}`}
+                  onClick={() => setCurrentStep(2)}
+                  style={{ flex: 1, minWidth: '200px' }}
+                >
+                  <div className="wizard-step-circle">
+                    {currentStep > 2 ? '✓' : 2}
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: '13px', fontWeight: '700', lineHeight: '1.2', color: currentStep === 2 ? '#c13584' : 'inherit' }}>
+                      2. Select Media
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '2px' }}>
+                      {videoFilename ? `✓ ${videoFilename}` : 'Videos & Photos'}
+                    </div>
+                  </div>
+                </div>
+
+                <ChevronRight size={16} color="var(--border-strong)" style={{ flexShrink: 0 }} />
+
+                {/* Step 3 */}
+                <div
+                  className={`wizard-step-item ${currentStep === 3 ? 'active' : (currentStep > 3 ? 'completed' : '')}`}
+                  onClick={() => setCurrentStep(3)}
+                  style={{ flex: 1, minWidth: '200px' }}
+                >
+                  <div className="wizard-step-circle">
+                    {currentStep > 3 ? '✓' : 3}
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: '13px', fontWeight: '700', lineHeight: '1.2', color: currentStep === 3 ? '#c13584' : 'inherit' }}>
+                      3. Captions &amp; AI
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '2px' }}>
+                      {captions.instagram ? '✓ AI Copy & Tags Ready' : 'AI Generation Studio'}
+                    </div>
+                  </div>
+                </div>
+
+                <ChevronRight size={16} color="var(--border-strong)" style={{ flexShrink: 0 }} />
+
+                {/* Step 4 */}
+                <div
+                  className={`wizard-step-item ${currentStep === 4 ? 'active' : ''}`}
+                  onClick={() => setCurrentStep(4)}
+                  style={{ flex: 1, minWidth: '200px' }}
+                >
+                  <div className="wizard-step-circle">4</div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: '13px', fontWeight: '700', lineHeight: '1.2', color: currentStep === 4 ? '#c13584' : 'inherit' }}>
+                      4. Preview &amp; Dispatch
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '2px' }}>
+                      {selectedPlatforms.length > 0 ? `${selectedPlatforms.length} Channels Active` : 'Schedule & Publish'}
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Step 2 Pill */}
-              <div
-                className={`wizard-step-item ${currentStep === 2 ? 'active' : (currentStep > 2 ? 'completed' : '')}`}
-                onClick={() => setCurrentStep(2)}
-              >
-                <div className="wizard-step-circle">2</div>
-                <div>
-                  <div style={{ fontSize: '13px', lineHeight: '1.2' }}>Select Media</div>
-                  <div style={{ fontSize: '11px', opacity: 0.75 }}>Videos &amp; Photos</div>
-                </div>
+              {/* Smooth Instagram Gradient Progress Bar */}
+              <div style={{
+                marginTop: '10px',
+                height: '4px',
+                borderRadius: '999px',
+                background: 'var(--sand-100)',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  height: '100%',
+                  width: `${(currentStep / 4) * 100}%`,
+                  background: 'linear-gradient(90deg, #833ab4 0%, #c13584 35%, #e1306c 65%, #fd1d1d 85%, #f77737 100%)',
+                  borderRadius: '999px',
+                  transition: 'width 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                }} />
               </div>
-
-              {/* Step 3 Pill */}
-              <div
-                className={`wizard-step-item ${currentStep === 3 ? 'active' : (currentStep > 3 ? 'completed' : '')}`}
-                onClick={() => setCurrentStep(3)}
-              >
-                <div className="wizard-step-circle">3</div>
-                <div>
-                  <div style={{ fontSize: '13px', lineHeight: '1.2' }}>Captions &amp; Details</div>
-                  <div style={{ fontSize: '11px', opacity: 0.75 }}>AI &amp; Hashtags</div>
-                </div>
-              </div>
-
-              {/* Step 4 Pill */}
-              <div
-                className={`wizard-step-item ${currentStep === 4 ? 'active' : ''}`}
-                onClick={() => setCurrentStep(4)}
-              >
-                <div className="wizard-step-circle">4</div>
-                <div>
-                  <div style={{ fontSize: '13px', lineHeight: '1.2' }}>Live Previews</div>
-                  <div style={{ fontSize: '11px', opacity: 0.75 }}>&amp; Multi-Publish</div>
-                </div>
-              </div>
-
             </div>
 
             {/* Wizard Step 1: Select Client & Connected Social Media Links */}
@@ -775,6 +1056,7 @@ export default function Home() {
                 selectedClientId={selectedClientId}
                 onSelectClient={handleSelectClient}
                 onOpenAddClient={() => setIsAddClientOpen(true)}
+                onOpenManageAccounts={() => setIsManageAccountsOpen(true)}
                 onToggleAccount={handleToggleAccount}
                 onNext={() => setCurrentStep(2)}
               />
@@ -816,6 +1098,7 @@ export default function Home() {
                 isGeneratingAi={false}
                 onBack={() => setCurrentStep(2)}
                 onNext={() => setCurrentStep(4)}
+                clientAccounts={currentClient?.social_accounts}
               />
             )}
 
@@ -848,6 +1131,7 @@ export default function Home() {
                 onBack={() => setCurrentStep(3)}
                 onViewHistory={() => setActiveView('history')}
                 posts={posts}
+                clientAccounts={currentClient?.social_accounts}
               />
             )}
           </>
@@ -868,6 +1152,13 @@ export default function Home() {
         onAddClient={handleAddClient}
       />
 
+      <ManageAccountsModal
+        client={currentClient || null}
+        isOpen={isManageAccountsOpen}
+        onClose={() => setIsManageAccountsOpen(false)}
+        onAccountsUpdated={handleAccountsUpdated}
+      />
+
       <PostSuccessModal
         isOpen={isSuccessModalOpen}
         onClose={() => setIsSuccessModalOpen(false)}
@@ -886,6 +1177,14 @@ export default function Home() {
         onCreateNewPost={() => {
           setIsSuccessModalOpen(false);
           setCurrentStep(1);
+        }}
+        onRetry={async (postId) => {
+          await handleRetry(postId);
+          const updated = await api.getPosts().catch(() => []);
+          const matched = updated.find(p => p.id === postId);
+          if (matched) {
+            setSuccessPostModal(matched);
+          }
         }}
       />
 

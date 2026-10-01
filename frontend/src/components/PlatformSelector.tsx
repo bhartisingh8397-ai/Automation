@@ -22,8 +22,7 @@ export const PlatformSelector: React.FC<PlatformSelectorProps> = ({
     { id: 'instagram', label: 'Instagram', subLabel: 'Post as Reel' },
     { id: 'facebook', label: 'Facebook', subLabel: 'Post as Video/Reel' },
     { id: 'youtube', label: 'YouTube', subLabel: 'Upload as Video' },
-    { id: 'linkedin', label: 'LinkedIn', subLabel: 'Post as Video' },
-    { id: 'twitter', label: 'Twitter / X', subLabel: 'Post Tweet with video' }
+    { id: 'linkedin', label: 'LinkedIn', subLabel: 'Post as Video' }
   ];
 
   return (
@@ -78,21 +77,20 @@ export const PlatformSelector: React.FC<PlatformSelectorProps> = ({
                   alignItems: 'center',
                   gap: '12px',
                   padding: '12px',
-                  background: isSelected ? '#f8f9fa' : '#ffffff',
-                  border: `1px solid ${isSelected ? '#09090b' : '#e4e4e7'}`,
-                  borderRadius: 'var(--radius-sm)',
+                  background: isSelected ? 'var(--rust-50)' : '#ffffff',
+                  border: `1.5px solid ${isSelected ? 'var(--accent-primary)' : 'var(--border-default)'}`,
+                  borderRadius: 'var(--radius-md)',
                   cursor: 'pointer',
-                  transition: 'var(--transition)',
-                  boxShadow: isSelected ? '0 2px 8px rgba(0,0,0,0.06)' : 'none'
+                  transition: 'var(--transition)'
                 }}
               >
                 {/* Custom Checkbox */}
                 <div style={{
                   width: '18px',
                   height: '18px',
-                  borderRadius: '4px',
-                  border: `1px solid ${isSelected ? '#09090b' : '#d4d4d8'}`,
-                  background: isSelected ? '#09090b' : '#ffffff',
+                  borderRadius: '5px',
+                  border: `1.5px solid ${isSelected ? '#c13584' : 'var(--border-strong)'}`,
+                  background: isSelected ? 'linear-gradient(135deg, #833ab4, #c13584)' : '#ffffff',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -106,10 +104,10 @@ export const PlatformSelector: React.FC<PlatformSelectorProps> = ({
 
                 {/* Platform Name and Publishing Sublabel */}
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '13px', fontWeight: '600', color: '#09090b' }}>
+                  <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>
                     {item.label}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#71717a', marginTop: '1px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '1px' }}>
                     {item.subLabel}
                   </div>
                 </div>

@@ -173,20 +173,20 @@ ON DUPLICATE KEY UPDATE video_filename=VALUES(video_filename);
 
 -- Post Platforms Delivery records
 INSERT INTO post_platforms (post_id, platform, post_type, status, platform_post_id, platform_post_url, published_at) VALUES
-(1, 'instagram', 'Reel', 'Published', 'reel_ig_9812401', 'https://instagram.com/reel/C89218xKeshav', '2026-09-25 19:30:15'),
-(1, 'facebook', 'Video/Reel', 'Published', 'fb_vid_5419827', 'https://facebook.com/keshavhospital/videos/5419827', '2026-09-25 19:30:20'),
-(1, 'youtube', 'Video', 'Published', 'yt_vid_K8h92_1v', 'https://youtube.com/watch?v=K8h92_1v', '2026-09-25 19:30:25'),
-(1, 'linkedin', 'Video', 'Published', 'li_urn_891724', 'https://linkedin.com/feed/update/urn:li:activity:891724', '2026-09-25 19:30:30'),
+(1, 'instagram', 'Reel', 'Published', 'reel_ig_9812401', 'https://www.instagram.com/keshav_hospital/', '2026-09-25 19:30:15'),
+(1, 'facebook', 'Video/Reel', 'Published', 'fb_vid_5419827', 'https://www.facebook.com/keshavhospital', '2026-09-25 19:30:20'),
+(1, 'youtube', 'Video', 'Published', 'yt_vid_K8h92_1v', 'https://www.youtube.com/@bhartisingh-e9h/videos', '2026-09-25 19:30:25'),
+(1, 'linkedin', 'Video', 'Published', 'li_urn_891724', 'https://www.linkedin.com/company/keshav-hospital-official', '2026-09-25 19:30:30'),
 
-(2, 'instagram', 'Reel', 'Pending', NULL, NULL, NULL),
-(2, 'facebook', 'Video/Reel', 'Pending', NULL, NULL, NULL),
-(2, 'youtube', 'Video', 'Pending', NULL, NULL, NULL),
-(2, 'linkedin', 'Video', 'Pending', NULL, NULL, NULL),
+(2, 'instagram', 'Reel', 'Pending', NULL, 'https://www.instagram.com/roshnidental_care/', NULL),
+(2, 'facebook', 'Video/Reel', 'Pending', NULL, 'https://www.facebook.com/roshnidental', NULL),
+(2, 'youtube', 'Video', 'Pending', NULL, 'https://www.youtube.com/@bhartisingh-e9h/videos', NULL),
+(2, 'linkedin', 'Video', 'Pending', NULL, 'https://www.linkedin.com/company/roshni-dental', NULL),
 
-(3, 'instagram', 'Reel', 'Published', 'reel_ig_498210', 'https://instagram.com/reel/D91834xNoble', '2026-09-24 18:00:15'),
-(3, 'facebook', 'Video/Reel', 'Published', 'fb_vid_891024', 'https://facebook.com/noblehospital/videos/891024', '2026-09-24 18:00:22'),
-(3, 'youtube', 'Video', 'Failed', NULL, NULL, NULL),
-(3, 'linkedin', 'Video', 'Published', 'li_urn_728910', 'https://linkedin.com/feed/update/urn:li:activity:728910', '2026-09-24 18:00:35'),
+(3, 'instagram', 'Reel', 'Published', 'reel_ig_498210', 'https://www.instagram.com/noble_hospital/', '2026-09-24 18:00:15'),
+(3, 'facebook', 'Video/Reel', 'Published', 'fb_vid_891024', 'https://www.facebook.com/noblehospital', '2026-09-24 18:00:22'),
+(3, 'youtube', 'Video', 'Failed', NULL, 'https://www.youtube.com/@bhartisingh-e9h/videos', NULL),
+(3, 'linkedin', 'Video', 'Published', 'li_urn_728910', 'https://www.linkedin.com/company/noble-hospital', '2026-09-24 18:00:35'),
 
 (4, 'instagram', 'Reel', 'Failed', NULL, NULL, NULL),
 (4, 'facebook', 'Video/Reel', 'Failed', NULL, NULL, NULL),

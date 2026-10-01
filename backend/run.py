@@ -24,7 +24,7 @@ def main():
     # 3. Create and launch Flask Web Server
     print("[3/3] Starting Flask REST API on http://127.0.0.1:5000 ...")
     app = create_app()
-    app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)
+    app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False, threaded=True)
 
 if __name__ == "__main__":
     main()

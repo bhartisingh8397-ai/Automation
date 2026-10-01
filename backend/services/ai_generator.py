@@ -82,13 +82,6 @@ class AIGenerator:
         # LinkedIn Caption (professional, executive summary)
         caption_linkedin = f"{client_name} continues to expand accessible and state-of-the-art services with the introduction of {topic_clean}.\n\n{hook}\n\nOur commitment to operational excellence, clinical safety, and patient-first innovation drives our daily mission.\n\nKey Highlights:\n• Advanced Infrastructure & 24x7 Readiness\n• Certified Specialists\n• Seamless Patient Care Coordination\n\n{cta}\n\n{' '.join(tmpl['tags'])} #Leadership #HealthcareExcellence"
 
-        # Twitter / X Caption (concise, <= 280 chars, punchy)
-        clean_tag = f"#{client_name.replace(' ', '')}"
-        first_tag = tmpl['tags'][0] if tmpl['tags'] else '#Healthcare'
-        caption_twitter = f"🚨 {topic_clean} अब {client_name} में उपलब्ध!\n\n{hook[:100]}...\n\n👉 {cta}\n\n{first_tag} {clean_tag}"
-        if len(caption_twitter) > 280:
-            caption_twitter = caption_twitter[:276] + "..."
-
         # Hashtags string
         hashtags_list = tmpl["tags"] + [f"#{client_name.replace(' ', '')}"]
         hashtags_str = " ".join(hashtags_list)
@@ -99,7 +92,6 @@ class AIGenerator:
             "caption_facebook": caption_facebook,
             "caption_youtube": caption_youtube,
             "caption_linkedin": caption_linkedin,
-            "caption_twitter": caption_twitter,
             "youtube_title": youtube_title,
             "hashtags": hashtags_str,
             "hashtags_list": hashtags_list

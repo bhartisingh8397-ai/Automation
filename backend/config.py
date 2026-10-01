@@ -26,6 +26,21 @@ class Config:
     # Construct database URI
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
+    # YouTube Data API v3 & Google OAuth Credentials
+    YOUTUBE_CLIENT_ID = os.getenv("YOUTUBE_CLIENT_ID", "")
+    YOUTUBE_CLIENT_SECRET = os.getenv("YOUTUBE_CLIENT_SECRET", "")
+    YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY", "")
+    YOUTUBE_REDIRECT_URI = os.getenv("YOUTUBE_REDIRECT_URI", "http://localhost:5000/api/youtube/oauth2callback")
+    YOUTUBE_TOKEN_FILE = BASE_DIR / "youtube_tokens.json"
+
+    # Meta (Facebook & Instagram) Graph API Credentials
+    META_APP_ID = os.getenv("META_APP_ID", "")
+    META_APP_SECRET = os.getenv("META_APP_SECRET", "")
+    META_REDIRECT_URI = os.getenv("META_REDIRECT_URI", "http://localhost:5000/api/meta/oauth2callback")
+    META_ACCESS_TOKEN = os.getenv("META_ACCESS_TOKEN", "")
+    META_TOKEN_FILE = BASE_DIR / "meta_tokens.json"
+
+    
     @classmethod
     def get_mysql_uri(cls):
         # PyMySQL connection string

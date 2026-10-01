@@ -25,12 +25,21 @@ env.bak/
 venv.bak/
 .venv/
 
-# Environment files
+# Environment files & Secrets
 .env
 .env*.local
 backend/.env
 frontend/.env
 frontend/.env*.local
+*tokens*.json
+backend/*tokens*.json
+env_check.txt
+nodever.txt
+pyver.txt
+pip_install.txt
+backend/pip_install.txt
+test_result.json
+backend/test_result.json
 
 # Database
 *.db

@@ -108,7 +108,8 @@ class Post(Base):
             "timezone": self.timezone,
             "overall_status": self.overall_status,
             "created_at": self.created_at.isoformat() if self.created_at else None,
-            "platforms": [p.to_dict() for p in self.platforms] if self.platforms else []
+            "platforms": [p.to_dict() for p in self.platforms] if self.platforms else [],
+            "client_social_accounts": [acc.to_dict() for acc in self.client.social_accounts] if (self.client and self.client.social_accounts) else []
         }
 
 class PostPlatform(Base):

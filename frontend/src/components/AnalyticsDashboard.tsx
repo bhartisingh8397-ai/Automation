@@ -79,18 +79,6 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
       bgColor: '#fff0f5'
     },
     {
-      platform: 'twitter',
-      name: 'Twitter / X',
-      likes: Math.round(totalLikes * 0.22),
-      comments: Math.round(totalComments * 0.20),
-      shares: Math.round(totalShares * 0.28),
-      views: Math.round(totalViews * 0.20),
-      growth: '+19.2%',
-      badge: 'Fastest Virality',
-      color: '#000000',
-      bgColor: '#f4f4f5'
-    },
-    {
       platform: 'youtube',
       name: 'YouTube',
       likes: Math.round(totalLikes * 0.18),
@@ -189,11 +177,6 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                 </button>
               ))}
             </div>
-
-            <button type="button" onClick={onSync} style={{ padding: '8px 14px', fontSize: '12px', gap: '6px', backgroundColor: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', color: '#ffffff', cursor: 'pointer', display: 'flex', alignItems: 'center', fontWeight: '600' }}>
-              <RefreshCw size={13} className={isSyncing ? 'animate-spin' : ''} />
-              <span>Sync</span>
-            </button>
           </div>
         </div>
 
@@ -431,11 +414,10 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           {/* Stacked Horizontal Bars */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {[
-              { platform: 'instagram', label: 'Instagram', pct: 42, color: '#e1306c' },
-              { platform: 'twitter', label: 'Twitter / X', pct: 22, color: '#000000' },
-              { platform: 'youtube', label: 'YouTube', pct: 18, color: '#ff0000' },
-              { platform: 'facebook', label: 'Facebook', pct: 12, color: '#1877f2' },
-              { platform: 'linkedin', label: 'LinkedIn', pct: 6, color: '#0a66c2' }
+              { platform: 'instagram', label: 'Instagram', pct: 48, color: '#e1306c' },
+              { platform: 'youtube', label: 'YouTube', pct: 26, color: '#ff0000' },
+              { platform: 'facebook', label: 'Facebook', pct: 16, color: '#1877f2' },
+              { platform: 'linkedin', label: 'LinkedIn', pct: 10, color: '#0a66c2' }
             ].map(item => (
               <div key={item.platform} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <SocialIcon platform={item.platform} size={18} />
@@ -594,7 +576,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
 
                   const platformKeys = post.platforms && post.platforms.length > 0
                     ? post.platforms.map(p => p.platform)
-                    : ['instagram', 'facebook', 'youtube', 'linkedin', 'twitter'];
+                    : ['instagram', 'facebook', 'youtube', 'linkedin'];
 
                   const isPublished = post.overall_status === 'Published';
 

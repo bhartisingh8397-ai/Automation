@@ -92,7 +92,6 @@ def create_post():
         caption_facebook = data.get("caption_facebook", caption_general)
         caption_youtube = data.get("caption_youtube", caption_general)
         caption_linkedin = data.get("caption_linkedin", caption_general)
-        caption_twitter = data.get("caption_twitter", caption_general)
         youtube_title = data.get("youtube_title", "")
         hashtags = data.get("hashtags", "")
         
@@ -125,7 +124,6 @@ def create_post():
             caption_facebook=caption_facebook,
             caption_youtube=caption_youtube,
             caption_linkedin=caption_linkedin,
-            caption_twitter=caption_twitter,
             youtube_title=youtube_title,
             hashtags=hashtags,
             schedule_type=schedule_type,
@@ -137,7 +135,7 @@ def create_post():
         session.commit()
 
         # Target platforms selected
-        platforms_selected = data.get("platforms", ["instagram", "facebook", "youtube", "linkedin", "twitter"])
+        platforms_selected = data.get("platforms", ["instagram", "facebook", "youtube", "linkedin"])
         if not platforms_selected:
             platforms_selected = ["instagram", "facebook"]
 
@@ -146,16 +144,14 @@ def create_post():
                 "instagram": "Photo / Carousel",
                 "facebook": "Photo Post",
                 "youtube": "Community Post",
-                "linkedin": "Image Post",
-                "twitter": "Photo Tweet"
+                "linkedin": "Image Post"
             }
         else:
             platform_types = {
                 "instagram": "Reel",
                 "facebook": "Video/Reel",
                 "youtube": "Video",
-                "linkedin": "Video",
-                "twitter": "Video Tweet"
+                "linkedin": "Video"
             }
 
         for plat in platforms_selected:
@@ -188,10 +184,12 @@ def create_post():
         session.add_all([log1, log2])
         session.commit()
 
-        # If publish now, execute immediately
+        # If publish now, execute asynchronously in background thread so UI never freezes
         if schedule_type == 'now':
-            PlatformPublisher.publish_post(post.id)
+            import threading
+            threading.Thread(target=PlatformPublisher.publish_post, args=(post.id,), daemon=True).start()
         else:
+
             # Step 3: Wait Until Scheduled Time
             log3 = AutomationLog(
                 post_id=post.id,
@@ -256,6 +254,33 @@ def delete_post(post_id):
 def get_media(filename):
     upload_folder = Config.UPLOAD_FOLDER
     os.makedirs(upload_folder, exist_ok=True)
-    if os.path.exists(os.path.join(upload_folder, filename)):
+    target = os.path.join(upload_folder, filename)
+    if os.path.exists(target) and os.path.isfile(target):
         return send_from_directory(upload_folder, filename)
-    return jsonify({"message": f"Sample media stream placeholder for {filename}"}), 200
+        
+    # Check alternate naming (with/without sample- prefix)
+    if filename.startswith("sample-"):
+        alt = os.path.join(upload_folder, filename.replace("sample-", ""))
+        if os.path.exists(alt) and os.path.isfile(alt):
+            return send_from_directory(upload_folder, filename.replace("sample-", ""))
+    else:
+        alt = os.path.join(upload_folder, f"sample-{filename}")
+        if os.path.exists(alt) and os.path.isfile(alt):
+            return send_from_directory(upload_folder, f"sample-{filename}")
+
+    # Fallback for photo
+    is_photo = filename.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.gif'))
+    if is_photo:
+        for photo_fb in ["WhatsApp_Image_2026-09-24_at_17.54.39.jpeg", "WhatsApp_Image_2026-09-19_at_14.18.29.jpeg"]:
+            fb_path = os.path.join(upload_folder, photo_fb)
+            if os.path.exists(fb_path):
+                return send_from_directory(upload_folder, photo_fb)
+                
+    # Fallback for video
+    for vid_fb in ["blood-bank.mp4", "sample-blood-bank.mp4", "TRINETIX_contact_video_final_frame_20260922112430.mp4"]:
+        fb_path = os.path.join(upload_folder, vid_fb)
+        if os.path.exists(fb_path):
+            return send_from_directory(upload_folder, vid_fb)
+
+    return jsonify({"error": f"Media file not found for {filename}"}), 404
+

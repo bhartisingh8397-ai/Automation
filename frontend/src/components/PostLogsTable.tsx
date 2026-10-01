@@ -74,27 +74,6 @@ export const PostLogsTable: React.FC<PostLogsTableProps> = ({
             Track real-time status, post links and execution logs across platforms.
           </div>
         </div>
-
-        {onSync && (
-          <button
-            type="button"
-            onClick={onSync}
-            className="btn btn-outline"
-            style={{
-              padding: '6px 14px',
-              fontSize: '11px',
-              gap: '6px',
-              backgroundColor: '#ffffff',
-              border: '1px solid #e4e4e7',
-              color: '#09090b',
-              borderRadius: '8px'
-            }}
-            title="Sync posts and logs from MySQL"
-          >
-            <RefreshCw size={12} className={isSyncing ? 'animate-spin' : ''} />
-            <span>Sync Database</span>
-          </button>
-        )}
       </div>
 
       {/* Responsive Table Container */}
@@ -121,7 +100,7 @@ export const PostLogsTable: React.FC<PostLogsTableProps> = ({
                 // Collect platform keys
                 const platformKeys = post.platforms && post.platforms.length > 0
                   ? post.platforms.map(p => p.platform)
-                  : ['instagram', 'facebook', 'youtube', 'linkedin', 'twitter'];
+                  : ['instagram', 'facebook', 'youtube', 'linkedin'];
 
                 return (
                   <tr

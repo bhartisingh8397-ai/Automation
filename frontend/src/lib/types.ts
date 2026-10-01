@@ -1,4 +1,4 @@
-export type SocialPlatform = 'instagram' | 'facebook' | 'youtube' | 'linkedin' | 'twitter';
+export type SocialPlatform = 'instagram' | 'facebook' | 'youtube' | 'linkedin';
 
 export interface SocialAccount {
   id: number;
@@ -57,7 +57,6 @@ export interface Post {
   caption_facebook?: string;
   caption_youtube?: string;
   caption_linkedin?: string;
-  caption_twitter?: string;
   youtube_title?: string;
   hashtags?: string;
   schedule_type: 'now' | 'later';
@@ -66,6 +65,7 @@ export interface Post {
   overall_status: 'Scheduled' | 'Published' | 'Partially Failed' | 'Failed' | 'Processing' | 'Cancelled';
   created_at?: string;
   platforms: PostPlatform[];
+  client_social_accounts?: SocialAccount[];
 }
 
 export interface DatabaseInfo {

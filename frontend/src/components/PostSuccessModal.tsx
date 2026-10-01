@@ -9,13 +9,16 @@ import {
   ExternalLink,
   Copy,
   Sparkles,
-  ArrowRight,
-  PlusCircle,
   X,
   History,
+  PlusCircle,
+  Video,
+  AlertCircle,
+  AlertTriangle,
+  RotateCcw,
+  Loader2,
   Calendar,
-  Clock,
-  Video
+  Clock
 } from 'lucide-react';
 
 interface PostSuccessModalProps {
@@ -31,6 +34,7 @@ interface PostSuccessModalProps {
   timezone?: string;
   onViewHistory: () => void;
   onCreateNewPost: () => void;
+  onRetry?: (postId: number) => Promise<void>;
 }
 
 export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
@@ -45,23 +49,133 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
   scheduleTime,
   timezone,
   onViewHistory,
-  onCreateNewPost
+  onCreateNewPost,
+  onRetry
 }) => {
   const [copiedPlatform, setCopiedPlatform] = useState<string | null>(null);
+  const [isRetrying, setIsRetrying] = useState<boolean>(false);
+  const [retrySuccess, setRetrySuccess] = useState<string | null>(null);
 
-  // Trigger celebration confetti on open
+  const slug = (clientName || 'digigyapan').toLowerCase().replace(/\s+/g, '');
+  const isImmediate = scheduleType === 'now';
+
+  // Real YouTube Channel URL for Bharti Singh / Digigyapan
+  const REAL_YOUTUBE_CHANNEL = 'https://www.youtube.com/@bhartisingh-e9h';
+
+  // Helper to determine clean post type
+  function getPostType(plat: SocialPlatform): string {
+    switch (plat) {
+      case 'instagram': return 'Reel';
+      case 'facebook': return 'Video/Reel';
+      case 'youtube': return 'Video';
+      case 'linkedin': return 'Post & Video';
+      default: return 'Post';
+    }
+  }
+
+  // Safe URL generator that links to client's authentic channels
+  function getAccountHandle(plat: SocialPlatform): string {
+    if (post?.client_social_accounts && post.client_social_accounts.length > 0) {
+      const match = post.client_social_accounts.find(a => a.platform.toLowerCase() === plat);
+      if (match?.account_handle) {
+        return match.account_handle.trim().replace(/^@/, '');
+      }
+    }
+    return slug;
+  }
+
+  function resolvePlatformLink(plat: SocialPlatform, rawUrl?: string | null, status?: string): { url: string; label: string; isRealVideo: boolean } {
+    const handle = getAccountHandle(plat).replace(/\s+/g, '').replace(/^https?:\/\/[^/]+\/?/, '').replace(/\/$/, '');
+
+    if (plat === 'youtube') {
+      if (rawUrl && (rawUrl.includes('watch?v=') || rawUrl.includes('youtu.be/')) && !rawUrl.includes('wJINj8w85JA') && !rawUrl.includes('yt_vid_K8h92_1v')) {
+        return {
+          url: rawUrl,
+          label: 'Watch Video on YouTube',
+          isRealVideo: true
+        };
+      }
+      return {
+        url: `${REAL_YOUTUBE_CHANNEL}/videos`,
+        label: 'View YouTube Channel',
+        isRealVideo: false
+      };
+    }
+
+    if (plat === 'instagram') {
+      return {
+        url: `https://www.instagram.com/${handle}/`,
+        label: 'View Instagram Profile',
+        isRealVideo: false
+      };
+    }
+
+    if (plat === 'facebook') {
+      return {
+        url: `https://www.facebook.com/${handle}`,
+        label: 'View Facebook Page',
+        isRealVideo: false
+      };
+    }
+
+    if (plat === 'linkedin') {
+      return {
+        url: `https://www.linkedin.com/company/${handle}`,
+        label: 'View LinkedIn Page',
+        isRealVideo: false
+      };
+    }
+
+    return {
+      url: `https://${plat}.com/${handle}`,
+      label: `View ${plat}`,
+      isRealVideo: false
+    };
+  }
+
+  // Build platform list
+  const platformsToDisplay = (post?.platforms && post.platforms.length > 0)
+    ? post.platforms.map(p => {
+        const linkInfo = resolvePlatformLink(p.platform as SocialPlatform, p.platform_post_url, p.status);
+        return {
+          platform: p.platform as SocialPlatform,
+          postType: p.post_type || getPostType(p.platform as SocialPlatform),
+          url: linkInfo.url,
+          buttonLabel: linkInfo.label,
+          isRealVideo: linkInfo.isRealVideo,
+          status: p.status,
+          errorMessage: p.error_message
+        };
+      })
+    : selectedPlatforms.map(plat => {
+        const linkInfo = resolvePlatformLink(plat, null, scheduleType === 'now' ? 'Published' : 'Scheduled');
+        return {
+          platform: plat,
+          postType: getPostType(plat),
+          url: linkInfo.url,
+          buttonLabel: linkInfo.label,
+          isRealVideo: linkInfo.isRealVideo,
+          status: scheduleType === 'now' ? 'Published' : 'Scheduled',
+          errorMessage: undefined
+        };
+      });
+
+  const anyFailed = platformsToDisplay.some(p => p.status === 'Failed');
+  const allFailed = platformsToDisplay.length > 0 && platformsToDisplay.every(p => p.status === 'Failed');
+  const allPublished = platformsToDisplay.length > 0 && platformsToDisplay.every(p => p.status === 'Published');
+
+  // Trigger confetti only when publish succeeded without complete failure
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !allFailed) {
       fireConfetti();
     }
-  }, [isOpen]);
+  }, [isOpen, allFailed]);
 
   if (!isOpen) return null;
 
   const fireConfetti = () => {
     if (typeof window === 'undefined') return;
     try {
-      // Big initial burst
       confetti({
         particleCount: 90,
         spread: 80,
@@ -69,7 +183,6 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
         colors: ['#22c55e', '#16a34a', '#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6']
       });
 
-      // Side cannons after slight delay
       setTimeout(() => {
         confetti({
           particleCount: 50,
@@ -102,52 +215,20 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
     }
   };
 
-  // Build platform list with links
-  const slug = (clientName || 'digigyapan').toLowerCase().replace(/\s+/g, '');
-  const platformsToDisplay = (post?.platforms && post.platforms.length > 0)
-    ? post.platforms.map(p => ({
-        platform: p.platform as SocialPlatform,
-        postType: p.post_type || 'Video',
-        url: p.platform_post_url || getDefaultUrl(p.platform as SocialPlatform, slug),
-        status: p.status
-      }))
-    : selectedPlatforms.map(plat => ({
-        platform: plat,
-        postType: getPostType(plat),
-        url: getDefaultUrl(plat, slug),
-        status: scheduleType === 'now' ? 'Published' : 'Scheduled'
-      }));
-
-  function getPostType(plat: SocialPlatform): string {
-    switch (plat) {
-      case 'instagram': return 'Reel';
-      case 'facebook': return 'Video/Reel';
-      case 'youtube': return 'Video';
-      case 'linkedin': return 'Post & Video';
-      case 'twitter': return 'Video Tweet';
-      default: return 'Post';
+  const handleInlineRetry = async () => {
+    if (!post || !onRetry) return;
+    try {
+      setIsRetrying(true);
+      setRetrySuccess(null);
+      await onRetry(post.id);
+      setRetrySuccess('Post retried successfully! Check updated status.');
+      setTimeout(() => setRetrySuccess(null), 4000);
+    } catch (err) {
+      console.error('Retry failed:', err);
+    } finally {
+      setIsRetrying(false);
     }
-  }
-
-  function getDefaultUrl(plat: SocialPlatform, cleanSlug: string): string {
-    const rand = Math.floor(100000 + Math.random() * 900000);
-    switch (plat) {
-      case 'twitter':
-        return `https://x.com/${cleanSlug}/status/189${rand}`;
-      case 'instagram':
-        return `https://instagram.com/reel/C${rand}x${cleanSlug.slice(0, 6)}`;
-      case 'facebook':
-        return `https://facebook.com/${cleanSlug}/videos/${rand}98`;
-      case 'youtube':
-        return `https://youtube.com/watch?v=yt_${rand}`;
-      case 'linkedin':
-        return `https://linkedin.com/feed/update/urn:li:activity:${rand}81`;
-      default:
-        return `https://${plat}.com/${cleanSlug}`;
-    }
-  }
-
-  const isImmediate = scheduleType === 'now';
+  };
 
   return (
     <div
@@ -155,7 +236,7 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
       onClick={onClose}
       style={{
         zIndex: 1000,
-        backgroundColor: 'rgba(9, 9, 11, 0.72)',
+        backgroundColor: 'rgba(9, 9, 11, 0.75)',
         backdropFilter: 'blur(6px)',
         display: 'flex',
         alignItems: 'center',
@@ -167,9 +248,9 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
         className="modal-content"
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: '560px',
+          maxWidth: '580px',
           width: '100%',
-          borderRadius: '18px',
+          borderRadius: '20px',
           padding: '28px 24px',
           backgroundColor: '#ffffff',
           boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.05)',
@@ -203,32 +284,44 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
           <X size={16} />
         </button>
 
-        {/* Celebration Header with Animated Tick Mark */}
+        {/* Dynamic Header State */}
         <div style={{ textAlign: 'center', paddingBottom: '16px' }}>
           
-          {/* Animated Tick Mark (Tick Nishan) */}
+          {/* Animated Status Icon */}
           <div style={{
             width: '76px',
             height: '76px',
             margin: '0 auto 16px auto',
             borderRadius: '50%',
-            backgroundColor: '#dcfce7',
+            backgroundColor: allFailed ? '#fee2e2' : (anyFailed ? '#fef3c7' : '#dcfce7'),
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 0 0 8px #f0fdf4, 0 8px 24px rgba(34, 197, 94, 0.25)',
+            boxShadow: allFailed
+              ? '0 0 0 8px #fef2f2, 0 8px 24px rgba(239, 68, 68, 0.25)'
+              : (anyFailed
+                ? '0 0 0 8px #fffbeb, 0 8px 24px rgba(245, 158, 11, 0.25)'
+                : '0 0 0 8px #f0fdf4, 0 8px 24px rgba(34, 197, 94, 0.25)'),
             position: 'relative'
           }}>
             <div style={{
               width: '52px',
               height: '52px',
               borderRadius: '50%',
-              backgroundColor: '#22c55e',
+              backgroundColor: allFailed ? '#ef4444' : (anyFailed ? '#f59e0b' : '#22c55e'),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <Check size={32} color="#ffffff" strokeWidth={3.5} />
+              {allFailed ? (
+                <AlertTriangle size={30} color="#ffffff" strokeWidth={2.5} />
+              ) : (
+                anyFailed ? (
+                  <AlertCircle size={30} color="#ffffff" strokeWidth={2.5} />
+                ) : (
+                  <Check size={32} color="#ffffff" strokeWidth={3.5} />
+                )
+              )}
             </div>
           </div>
 
@@ -240,7 +333,12 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
             letterSpacing: '-0.02em',
             margin: '0 0 6px 0'
           }}>
-            {isImmediate ? 'Post Successful!' : 'Post Scheduled Successfully!'}
+            {allFailed
+              ? 'Publishing Encountered Errors'
+              : (anyFailed
+                ? 'Partially Published'
+                : (isImmediate ? 'Post Successful & Live!' : 'Post Scheduled Successfully!'))
+            }
           </h2>
 
           <p style={{
@@ -249,40 +347,61 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
             margin: 0,
             lineHeight: '1.4'
           }}>
-            {isImmediate ? (
-              <>
-                Video processed and posted to <strong>{platformsToDisplay.length} social channels</strong> for{' '}
-                <strong style={{ color: '#09090b' }}>{clientName}</strong>.
-              </>
+            {allFailed ? (
+              <>Social platforms could not be reached. Review the error details below and retry.</>
             ) : (
-              <>
-                Post queued for automatic publishing on <strong>{scheduleDate} at {scheduleTime} ({timezone})</strong>.
-              </>
+              anyFailed ? (
+                <>Some channels were published successfully, while others encountered errors. You can retry failed platforms below.</>
+              ) : (
+                isImmediate ? (
+                  <>Video processed and posted to <strong>{platformsToDisplay.length} social channels</strong> for <strong style={{ color: '#09090b' }}>{clientName}</strong>.</>
+                ) : (
+                  <>Post queued for automatic publishing on <strong>{scheduleDate} at {scheduleTime} ({timezone})</strong>.</>
+                )
+              )
             )}
           </p>
 
-          {/* Replay Confetti Button */}
-          <button
-            type="button"
-            onClick={fireConfetti}
-            style={{
-              marginTop: '10px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '4px 12px',
-              fontSize: '11px',
-              fontWeight: '600',
-              color: '#16a34a',
+          {/* Replay Confetti Button (if successful) */}
+          {!allFailed && (
+            <button
+              type="button"
+              onClick={fireConfetti}
+              style={{
+                marginTop: '10px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '4px 12px',
+                fontSize: '11px',
+                fontWeight: '600',
+                color: '#16a34a',
+                backgroundColor: '#f0fdf4',
+                border: '1px solid #bbf7d0',
+                borderRadius: '20px',
+                cursor: 'pointer'
+              }}
+            >
+              <Sparkles size={12} />
+              <span>Celebrate Again 🎊</span>
+            </button>
+          )}
+
+          {/* Retry Success Banner */}
+          {retrySuccess && (
+            <div style={{
+              marginTop: '12px',
+              padding: '8px 14px',
+              borderRadius: '8px',
               backgroundColor: '#f0fdf4',
               border: '1px solid #bbf7d0',
-              borderRadius: '20px',
-              cursor: 'pointer'
-            }}
-          >
-            <Sparkles size={12} />
-            <span>Celebrate Again 🎊</span>
-          </button>
+              color: '#16a34a',
+              fontSize: '12px',
+              fontWeight: '600'
+            }}>
+              ✓ {retrySuccess}
+            </div>
+          )}
         </div>
 
         {/* Media Summary Box */}
@@ -306,6 +425,35 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
           </div>
         </div>
 
+        {/* Media Preview Box */}
+        {post?.video_url && (
+          <div style={{
+            marginBottom: '16px',
+            borderRadius: '10px',
+            overflow: 'hidden',
+            backgroundColor: '#09090b',
+            maxHeight: '180px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            {(post.media_type === 'photo' || /\.(jpg|jpeg|png|webp|gif)$/i.test(videoFilename)) ? (
+              <img
+                src={post.video_url.startsWith('http') ? post.video_url : `http://localhost:5000${post.video_url.startsWith('/') ? '' : '/'}${post.video_url}`}
+                alt={videoFilename}
+                style={{ maxHeight: '180px', maxWidth: '100%', objectFit: 'contain' }}
+              />
+            ) : (
+              <video
+                src={post.video_url.startsWith('http') ? post.video_url : `http://localhost:5000${post.video_url.startsWith('/') ? '' : '/'}${post.video_url}`}
+                controls
+                playsInline
+                style={{ maxHeight: '180px', maxWidth: '100%', width: '100%' }}
+              />
+            )}
+          </div>
+        )}
+
         {/* View Post Links Section */}
         <div>
           <div style={{
@@ -321,120 +469,200 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
               letterSpacing: '0.04em',
               color: '#71717a'
             }}>
-              View Post on Social Media ({platformsToDisplay.length})
+              Social Channels ({platformsToDisplay.length})
             </span>
             <span style={{
               fontSize: '11px',
-              color: '#16a34a',
+              color: allPublished ? '#16a34a' : (anyFailed ? '#d97706' : '#2563eb'),
               fontWeight: '600',
-              backgroundColor: '#f0fdf4',
+              backgroundColor: allPublished ? '#f0fdf4' : (anyFailed ? '#fef3c7' : '#eff6ff'),
               padding: '2px 8px',
               borderRadius: '12px'
             }}>
-              ✓ Active Links
+              {allPublished ? '✓ All Published' : (anyFailed ? '⚠ Review Status' : '📅 Scheduled')}
             </span>
           </div>
 
-          {/* List of Platforms with View Post Links */}
+          {/* List of Platforms with Verified Links */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {platformsToDisplay.map((item) => {
               const isCopied = copiedPlatform === item.platform;
+              const isFailed = item.status === 'Failed';
+              const isScheduled = item.status === 'Scheduled' || (!isImmediate && item.status !== 'Published');
 
               return (
                 <div
                   key={item.platform}
                   style={{
                     display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '10px 14px',
-                    borderRadius: '10px',
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e4e4e7',
+                    flexDirection: 'column',
+                    padding: '12px 14px',
+                    borderRadius: '12px',
+                    backgroundColor: isFailed ? '#fff5f5' : '#ffffff',
+                    border: isFailed ? '1px solid #fecaca' : '1px solid #e4e4e7',
                     boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
-                    gap: '12px'
+                    gap: '8px'
                   }}
                 >
-                  {/* Left: Brand Icon + Title */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-                    <SocialIcon platform={item.platform} size={24} />
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{
-                        fontSize: '13px',
-                        fontWeight: '700',
-                        color: '#09090b',
-                        textTransform: 'capitalize'
-                      }}>
-                        {item.platform === 'twitter' ? 'Twitter / X' : item.platform} {item.postType}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '12px'
+                  }}>
+                    {/* Left: Brand Icon + Title */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                      <SocialIcon platform={item.platform} size={26} />
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{
+                          fontSize: '13px',
+                          fontWeight: '700',
+                          color: '#09090b',
+                          textTransform: 'capitalize'
+                        }}>
+                          {item.platform} {item.postType}
+                        </div>
+                        <div style={{
+                          fontSize: '11px',
+                          color: isFailed ? '#dc2626' : (isScheduled ? '#d97706' : '#16a34a'),
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          marginTop: '2px',
+                          fontWeight: '500'
+                        }}>
+                          <span style={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            backgroundColor: isFailed ? '#ef4444' : (isScheduled ? '#f59e0b' : '#22c55e'),
+                            display: 'inline-block'
+                          }} />
+                          <span>
+                            {isFailed
+                              ? 'Upload Failed'
+                              : (isScheduled
+                                ? `Scheduled for ${scheduleDate || 'Selected Time'}`
+                                : 'Published & Live')}
+                          </span>
+                        </div>
                       </div>
-                      <div style={{
-                        fontSize: '11px',
-                        color: '#16a34a',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        marginTop: '1px'
-                      }}>
-                        <span style={{
-                          width: '6px',
-                          height: '6px',
-                          borderRadius: '50%',
-                          backgroundColor: '#22c55e',
-                          display: 'inline-block'
-                        }} />
-                        <span>{isImmediate ? 'Published & Live' : 'Scheduled'}</span>
-                      </div>
+                    </div>
+
+                    {/* Right: Actions */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                      {/* Copy Link Button (only if not failed) */}
+                      {!isFailed && (
+                        <button
+                          type="button"
+                          onClick={() => handleCopyLink(item.url, item.platform)}
+                          title="Copy social link"
+                          style={{
+                            padding: '6px 10px',
+                            fontSize: '11px',
+                            borderRadius: '6px',
+                            border: '1px solid #e4e4e7',
+                            backgroundColor: isCopied ? '#f0fdf4' : '#ffffff',
+                            color: isCopied ? '#16a34a' : '#71717a',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            transition: 'all 0.15s ease'
+                          }}
+                        >
+                          {isCopied ? <Check size={12} /> : <Copy size={12} />}
+                          <span>{isCopied ? 'Copied!' : 'Copy'}</span>
+                        </button>
+                      )}
+
+                      {/* If Failed, show Retry Button */}
+                      {isFailed && onRetry && post && (
+                        <button
+                          type="button"
+                          disabled={isRetrying}
+                          onClick={handleInlineRetry}
+                          style={{
+                            padding: '6px 12px',
+                            fontSize: '12px',
+                            fontWeight: '700',
+                            borderRadius: '6px',
+                            border: '1px solid #f87171',
+                            backgroundColor: '#fee2e2',
+                            color: '#b91c1c',
+                            cursor: isRetrying ? 'wait' : 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '5px'
+                          }}
+                        >
+                          {isRetrying ? (
+                            <>
+                              <Loader2 size={13} className="animate-spin" />
+                              <span>Retrying...</span>
+                            </>
+                          ) : (
+                            <>
+                              <RotateCcw size={12} />
+                              <span>Retry Upload</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+
+                      {/* View Post / Channel External Link */}
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-primary"
+                        style={{
+                          padding: '6px 14px',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          gap: '6px',
+                          textDecoration: 'none',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          backgroundColor: isFailed ? '#71717a' : '#09090b',
+                          color: '#ffffff',
+                          borderRadius: '6px'
+                        }}
+                      >
+                        <span>{item.buttonLabel}</span>
+                        <ExternalLink size={13} />
+                      </a>
                     </div>
                   </div>
 
-                  {/* Right: Actions - View Post & Copy Link */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-                    {/* Copy Link Button */}
-                    <button
-                      type="button"
-                      onClick={() => handleCopyLink(item.url, item.platform)}
-                      title="Copy post link"
-                      style={{
-                        padding: '6px 10px',
-                        fontSize: '11px',
-                        borderRadius: '6px',
-                        border: '1px solid #e4e4e7',
-                        backgroundColor: isCopied ? '#f0fdf4' : '#ffffff',
-                        color: isCopied ? '#16a34a' : '#71717a',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        transition: 'all 0.15s ease'
-                      }}
-                    >
-                      {isCopied ? <Check size={12} /> : <Copy size={12} />}
-                      <span>{isCopied ? 'Copied!' : 'Copy'}</span>
-                    </button>
+                  {/* Failure reason notice */}
+                  {isFailed && item.errorMessage && (
+                    <div style={{
+                      fontSize: '11px',
+                      color: '#b91c1c',
+                      backgroundColor: '#fef2f2',
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      marginTop: '2px',
+                      lineHeight: '1.3'
+                    }}>
+                      Error: {item.errorMessage}
+                    </div>
+                  )}
 
-                    {/* View Post External Link */}
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-primary"
-                      style={{
-                        padding: '6px 14px',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        gap: '6px',
-                        textDecoration: 'none',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        backgroundColor: '#09090b',
-                        color: '#ffffff',
-                        borderRadius: '6px'
-                      }}
-                    >
-                      <span>View Post</span>
-                      <ExternalLink size={13} />
-                    </a>
-                  </div>
+                  {/* Scheduled note */}
+                  {isScheduled && item.platform === 'youtube' && (
+                    <div style={{
+                      fontSize: '11px',
+                      color: '#6b7280',
+                      backgroundColor: '#f9fafb',
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      marginTop: '2px'
+                    }}>
+                      ℹ️ Video will go live on YouTube channel at scheduled time.
+                    </div>
+                  )}
                 </div>
               );
             })}

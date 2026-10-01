@@ -20,17 +20,17 @@ interface CaptionEditorProps {
     facebook: string;
     youtube: string;
     linkedin: string;
-    twitter?: string;
   };
   youtubeTitle: string;
   hashtags: string;
-  onCaptionChange: (platform: 'general' | 'instagram' | 'facebook' | 'youtube' | 'linkedin' | 'twitter', text: string) => void;
+  onCaptionChange: (platform: 'general' | 'instagram' | 'facebook' | 'youtube' | 'linkedin', text: string) => void;
   onYoutubeTitleChange: (title: string) => void;
   onHashtagsChange: (tags: string) => void;
   onGenerateAi: (topic: string) => Promise<void>;
   isGeneratingAi: boolean;
   onBack?: () => void;
   onNext?: () => void;
+  clientAccounts?: { platform: string; is_connected?: boolean }[];
 }
 
 export const CaptionEditor: React.FC<CaptionEditorProps> = ({
@@ -47,13 +47,22 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
   onGenerateAi,
   isGeneratingAi,
   onBack,
-  onNext
+  onNext,
+  clientAccounts = []
 }) => {
-  const [activeTab, setActiveTab] = useState<'general' | 'instagram' | 'facebook' | 'youtube' | 'linkedin' | 'twitter'>('general');
+  const availablePlatforms = (clientAccounts && clientAccounts.length > 0)
+    ? clientAccounts.map(a => a.platform.toLowerCase())
+    : ['instagram', 'facebook', 'youtube', 'linkedin'];
+
+  const [activeTab, setActiveTab] = useState<'general' | 'instagram' | 'facebook' | 'youtube' | 'linkedin'>('general');
   const [showAiPrompt, setShowAiPrompt] = useState(false);
   const [aiTopic, setAiTopic] = useState('24x7 Emergency Blood Bank & Intensive Care');
   const [newTag, setNewTag] = useState('');
-  const [previewPlatform, setPreviewPlatform] = useState<'instagram' | 'twitter' | 'facebook' | 'youtube' | 'linkedin'>('instagram');
+  const [previewPlatform, setPreviewPlatform] = useState<'instagram' | 'facebook' | 'youtube' | 'linkedin'>('instagram');
+
+  const effectivePreviewPlatform = availablePlatforms.includes(previewPlatform)
+    ? previewPlatform
+    : (availablePlatforms[0] as 'instagram' | 'facebook' | 'youtube' | 'linkedin') || 'instagram';
 
   const isPhoto = mediaType === 'photo' || (videoFilename && videoFilename.match(/\.(jpg|jpeg|png|webp)$/i));
   const handleClean = clientName.toLowerCase().replace(/\s+/g, '');
@@ -64,8 +73,7 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
     instagram: 2200,
     facebook: 5000,
     youtube: 5000,
-    linkedin: 3000,
-    twitter: 280
+    linkedin: 3000
   };
 
   const currentLimit = charLimits[activeTab];
@@ -98,7 +106,6 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
 
   const getPreviewCaption = (plat: string) => {
     if (plat === 'instagram') return captions.instagram || captions.general;
-    if (plat === 'twitter') return captions.twitter || captions.general;
     if (plat === 'facebook') return captions.facebook || captions.general;
     if (plat === 'youtube') return captions.youtube || captions.general;
     if (plat === 'linkedin') return captions.linkedin || captions.general;
@@ -133,26 +140,30 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
               <button type="button" className={`tab-btn ${activeTab === 'general' ? 'active' : ''}`} onClick={() => setActiveTab('general')}>
                 General
               </button>
-              <button type="button" className={`tab-btn ${activeTab === 'instagram' ? 'active' : ''}`} onClick={() => setActiveTab('instagram')}>
-                <SocialIcon platform="instagram" size={13} />
-                <span>Instagram</span>
-              </button>
-              <button type="button" className={`tab-btn ${activeTab === 'facebook' ? 'active' : ''}`} onClick={() => setActiveTab('facebook')}>
-                <SocialIcon platform="facebook" size={13} />
-                <span>Facebook</span>
-              </button>
-              <button type="button" className={`tab-btn ${activeTab === 'youtube' ? 'active' : ''}`} onClick={() => setActiveTab('youtube')}>
-                <SocialIcon platform="youtube" size={13} />
-                <span>YouTube</span>
-              </button>
-              <button type="button" className={`tab-btn ${activeTab === 'linkedin' ? 'active' : ''}`} onClick={() => setActiveTab('linkedin')}>
-                <SocialIcon platform="linkedin" size={13} />
-                <span>LinkedIn</span>
-              </button>
-              <button type="button" className={`tab-btn ${activeTab === 'twitter' ? 'active' : ''}`} onClick={() => setActiveTab('twitter')}>
-                <SocialIcon platform="twitter" size={13} />
-                <span>Twitter / X</span>
-              </button>
+              {availablePlatforms.includes('instagram') && (
+                <button type="button" className={`tab-btn ${activeTab === 'instagram' ? 'active' : ''}`} onClick={() => setActiveTab('instagram')}>
+                  <SocialIcon platform="instagram" size={13} />
+                  <span>Instagram</span>
+                </button>
+              )}
+              {availablePlatforms.includes('facebook') && (
+                <button type="button" className={`tab-btn ${activeTab === 'facebook' ? 'active' : ''}`} onClick={() => setActiveTab('facebook')}>
+                  <SocialIcon platform="facebook" size={13} />
+                  <span>Facebook</span>
+                </button>
+              )}
+              {availablePlatforms.includes('youtube') && (
+                <button type="button" className={`tab-btn ${activeTab === 'youtube' ? 'active' : ''}`} onClick={() => setActiveTab('youtube')}>
+                  <SocialIcon platform="youtube" size={13} />
+                  <span>YouTube</span>
+                </button>
+              )}
+              {availablePlatforms.includes('linkedin') && (
+                <button type="button" className={`tab-btn ${activeTab === 'linkedin' ? 'active' : ''}`} onClick={() => setActiveTab('linkedin')}>
+                  <SocialIcon platform="linkedin" size={13} />
+                  <span>LinkedIn</span>
+                </button>
+              )}
             </div>
 
             {/* YouTube Video Title Field */}
@@ -201,13 +212,13 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
                 onClick={() => setShowAiPrompt(!showAiPrompt)}
                 style={{ padding: '6px 12px', fontSize: '12px', gap: '6px' }}
               >
-                <Sparkles size={14} color="#09090b" />
+                <Sparkles size={14} color="#e1306c" />
                 <span>{isGeneratingAi ? 'Generating...' : 'Generate with AI'}</span>
               </button>
 
               {showAiPrompt && (
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                  Tailored for all 5 platforms
+                  Tailored for all 4 channels
                 </span>
               )}
             </div>
@@ -215,13 +226,13 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
             {/* AI Prompt Input Bar */}
             {showAiPrompt && (
               <div style={{
-                background: '#f8f9fa',
-                border: '1px solid #e4e4e7',
-                borderRadius: 'var(--radius-sm)',
-                padding: '10px',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-default)',
+                borderRadius: '10px',
+                padding: '12px',
                 marginBottom: '14px'
               }}>
-                <div style={{ fontSize: '11px', color: '#52525b', marginBottom: '6px' }}>
+                <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '6px' }}>
                   Describe topic or key highlight:
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
@@ -231,7 +242,7 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
                     value={aiTopic}
                     onChange={(e) => setAiTopic(e.target.value)}
                     placeholder="e.g. 24x7 Emergency Blood Bank & Trauma Care"
-                    style={{ padding: '6px 10px', fontSize: '12px', background: '#ffffff', color: '#09090b' }}
+                    style={{ padding: '6px 10px', fontSize: '12px', background: '#ffffff', color: 'var(--text-primary)' }}
                   />
                   <button
                     type="button"
@@ -333,7 +344,9 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
               </div>
               {/* Platform pills */}
               <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap' }}>
-                {(['instagram', 'twitter', 'facebook', 'youtube', 'linkedin'] as const).map(plat => (
+                {(['instagram', 'facebook', 'youtube', 'linkedin'] as const)
+                  .filter(plat => availablePlatforms.includes(plat))
+                  .map(plat => (
                   <button
                     key={plat}
                     type="button"
@@ -341,11 +354,11 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
                     style={{
                       padding: '3px 7px',
                       fontSize: '10px',
-                      fontWeight: previewPlatform === plat ? '700' : '500',
+                      fontWeight: effectivePreviewPlatform === plat ? '700' : '500',
                       borderRadius: '5px',
                       border: 'none',
-                      backgroundColor: previewPlatform === plat ? '#09090b' : 'transparent',
-                      color: previewPlatform === plat ? '#ffffff' : '#71717a',
+                      backgroundColor: effectivePreviewPlatform === plat ? '#09090b' : 'transparent',
+                      color: effectivePreviewPlatform === plat ? '#ffffff' : '#71717a',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
@@ -363,7 +376,7 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
             <div style={{ padding: '14px', backgroundColor: '#fafafa', minHeight: '340px' }}>
 
               {/* Instagram Preview */}
-              {previewPlatform === 'instagram' && (
+              {availablePlatforms.includes('instagram') && effectivePreviewPlatform === 'instagram' && (
                 <div style={{
                   maxWidth: '280px',
                   margin: '0 auto',
@@ -441,54 +454,10 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
                 </div>
               )}
 
-              {/* Twitter / X Preview */}
-              {previewPlatform === 'twitter' && (
-                <div style={{ borderRadius: '10px', backgroundColor: '#ffffff', border: '1px solid #e4e4e7', padding: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                    <div style={{ width: '34px', height: '34px', borderRadius: '50%', backgroundColor: '#000', color: '#fff', fontSize: '13px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{clientName.charAt(0)}</div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                        <span style={{ fontSize: '12px', fontWeight: '800', color: '#09090b' }}>{clientName}</span>
-                        <span style={{ color: '#1d9bf0', fontSize: '12px' }}>✓</span>
-                        <span style={{ fontSize: '10px', color: '#71717a' }}>@{handleClean}</span>
-                      </div>
-                      <span style={{ fontSize: '10px', color: '#a1a1aa' }}>Just now</span>
-                    </div>
-                    <SocialIcon platform="twitter" size={16} />
-                  </div>
-                  <p style={{ fontSize: '12px', color: '#0f1419', lineHeight: '1.4', margin: '0 0 10px 0', display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    {getPreviewCaption('twitter')}
-                  </p>
-                  {/* Twitter media attachment */}
-                  <div style={{ borderRadius: '10px', overflow: 'hidden', backgroundColor: '#000', height: '140px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
-                    {mediaPreviewUrl ? (
-                      isPhoto ? (
-                        <img src={mediaPreviewUrl} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      ) : (
-                        <>
-                          <video src={mediaPreviewUrl} muted loop autoPlay playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              <Play size={18} color="#ffffff" fill="#ffffff" style={{ marginLeft: '2px' }} />
-                            </div>
-                          </div>
-                        </>
-                      )
-                    ) : (
-                      isPhoto ? <ImageIcon size={28} color="rgba(255,255,255,0.5)" /> : <div style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Play size={18} color="#ffffff" fill="#ffffff" /></div>
-                    )}
-                  </div>
-                  <div style={{ display: 'flex', gap: '16px', fontSize: '10px', color: '#71717a', borderTop: '1px solid #f4f4f5', paddingTop: '8px' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}><MessageCircle size={13} />84</span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}><Repeat2 size={13} />210</span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}><Heart size={13} />1.4K</span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}><Eye size={13} />12.8K</span>
-                  </div>
-                </div>
-              )}
+
 
               {/* Facebook Preview */}
-              {previewPlatform === 'facebook' && (
+              {availablePlatforms.includes('facebook') && effectivePreviewPlatform === 'facebook' && (
                 <div style={{ borderRadius: '10px', backgroundColor: '#ffffff', border: '1px solid #e4e4e7', padding: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                     <div style={{ width: '34px', height: '34px', borderRadius: '8px', backgroundColor: '#1877f2', color: '#fff', fontSize: '13px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{clientName.charAt(0)}</div>
@@ -529,7 +498,7 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
               )}
 
               {/* YouTube Preview */}
-              {previewPlatform === 'youtube' && (
+              {availablePlatforms.includes('youtube') && effectivePreviewPlatform === 'youtube' && (
                 <div style={{ borderRadius: '10px', backgroundColor: '#ffffff', border: '1px solid #e4e4e7', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                   {/* YouTube thumbnail / video */}
                   <div style={{ backgroundColor: '#000', height: '140px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -568,7 +537,7 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
               )}
 
               {/* LinkedIn Preview */}
-              {previewPlatform === 'linkedin' && (
+              {availablePlatforms.includes('linkedin') && effectivePreviewPlatform === 'linkedin' && (
                 <div style={{ borderRadius: '10px', backgroundColor: '#ffffff', border: '1px solid #e4e4e7', padding: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                     <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: '#0a66c2', color: '#fff', fontSize: '13px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{clientName.charAt(0)}</div>
@@ -609,6 +578,11 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
                 </div>
               )}
 
+              {availablePlatforms.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '40px 20px', color: '#71717a', fontSize: '12px' }}>
+                  No connected platforms for this client to preview.
+                </div>
+              )}
             </div>
 
             {/* Preview Footer Note */}

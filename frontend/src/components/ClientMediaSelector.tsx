@@ -14,7 +14,9 @@ import {
   CheckCircle2,
   Sparkles,
   Layers,
-  FileCheck
+  FileCheck,
+  ShieldCheck,
+  Radio
 } from 'lucide-react';
 import { CLIENT_MEDIA_LIBRARY, ClientMediaItem } from '../lib/clientMedia';
 
@@ -94,14 +96,14 @@ export const ClientMediaSelector: React.FC<ClientMediaSelectorProps> = ({
     <div className="card" style={{ padding: '28px' }}>
       
       {/* Step 2 Header */}
-      <div className="card-header" style={{ marginBottom: '22px' }}>
+      <div className="card-header" style={{ marginBottom: '24px' }}>
         <div>
           <div className="card-title" style={{ fontSize: '20px' }}>
             <span className="step-badge">2</span>
-            <span>Select Media (Videos &amp; Photos)</span>
+            <span>Select Media Asset (Videos &amp; Photos)</span>
           </div>
           <div className="card-subtitle" style={{ fontSize: '13px', marginTop: '4px' }}>
-            Choose a video or photo asset from the media library for <strong style={{ color: '#09090b' }}>{clientName}</strong> or upload a custom file.
+            Choose a pre-rendered production asset for <strong style={{ color: '#2c2520' }}>{clientName}</strong> or upload a custom file.
           </div>
         </div>
       </div>
@@ -118,11 +120,11 @@ export const ClientMediaSelector: React.FC<ClientMediaSelectorProps> = ({
           {/* Sub Tabs: Client Library vs Direct Upload */}
           <div style={{
             display: 'flex',
-            gap: '4px',
-            backgroundColor: '#f4f4f5',
+            gap: '6px',
+            backgroundColor: 'var(--bg-secondary)',
             padding: '4px',
-            borderRadius: '8px',
-            border: '1px solid #e4e4e7',
+            borderRadius: '10px',
+            border: '1px solid var(--border-default)',
             marginBottom: '16px'
           }}>
             <button
@@ -130,20 +132,20 @@ export const ClientMediaSelector: React.FC<ClientMediaSelectorProps> = ({
               onClick={() => setActiveTab('library')}
               style={{
                 flex: 1,
-                padding: '8px 12px',
+                padding: '9px 14px',
                 backgroundColor: activeTab === 'library' ? '#ffffff' : 'transparent',
-                color: activeTab === 'library' ? '#09090b' : '#71717a',
-                fontSize: '12px',
+                color: activeTab === 'library' ? 'var(--accent-secondary)' : 'var(--text-muted)',
+                fontSize: '12.5px',
                 fontWeight: '700',
-                borderRadius: '6px',
-                border: 'none',
+                borderRadius: '8px',
+                border: activeTab === 'library' ? '1px solid var(--rust-100)' : 'none',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
                 transition: 'all 0.15s ease',
-                boxShadow: activeTab === 'library' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none'
+                boxShadow: activeTab === 'library' ? '0 1px 3px rgba(193, 53, 132, 0.12)' : 'none'
               }}
             >
               <Layers size={15} />
@@ -155,24 +157,24 @@ export const ClientMediaSelector: React.FC<ClientMediaSelectorProps> = ({
               onClick={() => setActiveTab('upload')}
               style={{
                 flex: 1,
-                padding: '8px 12px',
+                padding: '9px 14px',
                 backgroundColor: activeTab === 'upload' ? '#ffffff' : 'transparent',
-                color: activeTab === 'upload' ? '#09090b' : '#71717a',
-                fontSize: '12px',
+                color: activeTab === 'upload' ? 'var(--accent-secondary)' : 'var(--text-muted)',
+                fontSize: '12.5px',
                 fontWeight: '700',
-                borderRadius: '6px',
-                border: 'none',
+                borderRadius: '8px',
+                border: activeTab === 'upload' ? '1px solid var(--rust-100)' : 'none',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
                 transition: 'all 0.15s ease',
-                boxShadow: activeTab === 'upload' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none'
+                boxShadow: activeTab === 'upload' ? '0 1px 3px rgba(193, 53, 132, 0.12)' : 'none'
               }}
             >
               <UploadCloud size={15} />
-              <span>Upload Video / Photo</span>
+              <span>Upload Custom Asset</span>
             </button>
           </div>
 
@@ -180,9 +182,9 @@ export const ClientMediaSelector: React.FC<ClientMediaSelectorProps> = ({
           {activeTab === 'library' && (
             <div>
               {/* Type Filter Pills: All / Videos / Photos */}
-              <div style={{ display: 'flex', gap: '6px', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', gap: '6px', marginBottom: '14px' }}>
                 {[
-                  { id: 'all', label: `All (${clientMediaList.length})` },
+                  { id: 'all', label: `All Assets (${clientMediaList.length})` },
                   { id: 'video', label: 'Videos 🎥' },
                   { id: 'photo', label: 'Photos 📸' }
                 ].map(f => (
@@ -191,14 +193,15 @@ export const ClientMediaSelector: React.FC<ClientMediaSelectorProps> = ({
                     type="button"
                     onClick={() => setMediaFilter(f.id as any)}
                     style={{
-                      padding: '4px 10px',
-                      fontSize: '11px',
+                      padding: '5px 12px',
+                      fontSize: '11.5px',
                       fontWeight: mediaFilter === f.id ? '700' : '500',
-                      borderRadius: '6px',
-                      border: `1px solid ${mediaFilter === f.id ? '#09090b' : '#e4e4e7'}`,
-                      backgroundColor: mediaFilter === f.id ? '#09090b' : '#ffffff',
-                      color: mediaFilter === f.id ? '#ffffff' : '#71717a',
-                      cursor: 'pointer'
+                      borderRadius: '8px',
+                      border: `1px solid ${mediaFilter === f.id ? 'var(--accent-primary)' : 'var(--border-default)'}`,
+                      backgroundColor: mediaFilter === f.id ? 'var(--accent-primary)' : '#ffffff',
+                      color: mediaFilter === f.id ? '#ffffff' : 'var(--text-muted)',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
                     }}
                   >
                     {f.label}
@@ -217,38 +220,38 @@ export const ClientMediaSelector: React.FC<ClientMediaSelectorProps> = ({
                       key={item.id}
                       onClick={() => onSelectMediaItem(item)}
                       style={{
-                        padding: '12px 14px',
-                        borderRadius: '10px',
-                        backgroundColor: isSelected ? '#f8f9fa' : '#ffffff',
-                        border: `1.5px solid ${isSelected ? '#09090b' : '#e4e4e7'}`,
+                        padding: '14px 16px',
+                        borderRadius: '12px',
+                        backgroundColor: isSelected ? 'var(--rust-50)' : '#ffffff',
+                        border: `1.5px solid ${isSelected ? 'var(--accent-primary)' : 'var(--border-default)'}`,
                         cursor: 'pointer',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '8px',
+                        gap: '10px',
                         transition: 'all 0.15s ease',
-                        boxShadow: isSelected ? '0 3px 12px rgba(0,0,0,0.06)' : 'none'
+                        boxShadow: isSelected ? '0 4px 14px rgba(193, 53, 132, 0.18)' : '0 1px 3px rgba(25, 13, 34, 0.02)'
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
                           <div style={{
-                            width: '36px',
-                            height: '36px',
-                            borderRadius: '8px',
-                            backgroundColor: isSelected ? '#09090b' : '#f4f4f5',
-                            color: isSelected ? '#ffffff' : '#27272a',
+                            width: '42px',
+                            height: '42px',
+                            borderRadius: '10px',
+                            background: isSelected ? 'linear-gradient(135deg, #833ab4 0%, #c13584 100%)' : 'var(--bg-secondary)',
+                            color: isSelected ? '#ffffff' : 'var(--text-secondary)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             flexShrink: 0
                           }}>
-                            {itemIsPhoto ? <ImageIcon size={18} /> : <Film size={18} />}
+                            {itemIsPhoto ? <ImageIcon size={20} /> : <Film size={20} />}
                           </div>
                           <div style={{ minWidth: 0 }}>
-                            <div style={{ fontSize: '13px', fontWeight: '700', color: '#09090b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            <div style={{ fontSize: '13.5px', fontWeight: '700', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                               {item.title}
                             </div>
-                            <div style={{ fontSize: '11px', color: '#71717a' }}>
+                            <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
                               {item.filename}
                             </div>
                           </div>
@@ -259,12 +262,12 @@ export const ClientMediaSelector: React.FC<ClientMediaSelectorProps> = ({
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '4px',
+                            padding: '4px 10px',
+                            borderRadius: '9999px',
+                            background: 'linear-gradient(135deg, #833ab4 0%, #c13584 100%)',
+                            color: '#ffffff',
                             fontSize: '11px',
                             fontWeight: '700',
-                            color: '#ffffff',
-                            backgroundColor: '#09090b',
-                            padding: '3px 10px',
-                            borderRadius: '9999px',
                             flexShrink: 0
                           }}>
                             <Check size={12} strokeWidth={3} /> Selected
@@ -272,44 +275,40 @@ export const ClientMediaSelector: React.FC<ClientMediaSelectorProps> = ({
                         ) : (
                           <span style={{
                             fontSize: '11px',
-                            color: '#52525b',
-                            backgroundColor: '#f4f4f5',
-                            border: '1px solid #e4e4e7',
-                            padding: '3px 9px',
+                            color: 'var(--text-muted)',
+                            padding: '4px 8px',
                             borderRadius: '6px',
+                            background: 'var(--bg-secondary)',
                             flexShrink: 0
                           }}>
-                            Select
+                            {item.durationStr}
                           </span>
                         )}
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', color: '#71717a', paddingTop: '6px', borderTop: '1px solid #f4f4f5' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '11.5px', color: '#64748b' }}>
                         <span style={{
-                          backgroundColor: itemIsPhoto ? '#eff6ff' : '#f4f4f5',
                           padding: '2px 8px',
                           borderRadius: '4px',
-                          color: itemIsPhoto ? '#2563eb' : '#27272a',
-                          fontWeight: '600'
+                          backgroundColor: itemIsPhoto ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                          color: itemIsPhoto ? '#2563eb' : '#dc2626',
+                          fontWeight: '700',
+                          fontSize: '10.5px'
                         }}>
-                          {itemIsPhoto ? '📸 Photo Asset' : `🎥 Video (${item.category})`}
+                          {itemIsPhoto ? 'PHOTO' : 'VIDEO'}
                         </span>
-                        <span>{item.durationStr} • {item.fileSizeMb} MB</span>
+                        <span>Size: <strong style={{ color: '#334155' }}>{item.fileSizeMb} MB</strong></span>
+                        <span>•</span>
+                        <span>Duration: <strong style={{ color: '#334155' }}>{item.durationStr}</strong></span>
                       </div>
                     </div>
                   );
                 })}
-
-                {filteredMediaList.length === 0 && (
-                  <div style={{ textAlign: 'center', padding: '36px 16px', color: '#71717a', fontSize: '13px' }}>
-                    No media matching this filter. Switch to &quot;Upload Video / Photo&quot; to add custom media!
-                  </div>
-                )}
               </div>
             </div>
           )}
 
-          {/* Tab 2: Upload File (Video or Photo) */}
+          {/* Tab 2: Upload Custom Media */}
           {activeTab === 'upload' && (
             <div>
               <div
@@ -319,13 +318,13 @@ export const ClientMediaSelector: React.FC<ClientMediaSelectorProps> = ({
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
                 style={{
-                  border: `2px dashed ${dragOver ? '#09090b' : '#d4d4d8'}`,
-                  borderRadius: '12px',
-                  padding: '40px 20px',
+                  border: `2px dashed ${dragOver ? '#4f46e5' : '#cbd5e1'}`,
+                  borderRadius: '16px',
+                  padding: '40px 24px',
                   textAlign: 'center',
                   cursor: 'pointer',
-                  background: dragOver ? '#f4f4f5' : '#fafafa',
-                  transition: 'all 0.15s ease'
+                  background: dragOver ? 'rgba(99, 102, 241, 0.05)' : '#f8fafc',
+                  transition: 'all 0.2s ease'
                 }}
               >
                 <input
@@ -336,30 +335,30 @@ export const ClientMediaSelector: React.FC<ClientMediaSelectorProps> = ({
                   onChange={handleChange}
                 />
                 <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '50%',
-                  background: '#f4f4f5',
-                  border: '1px solid #e4e4e7',
+                  width: '52px',
+                  height: '52px',
+                  borderRadius: '14px',
+                  background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)',
+                  border: '1px solid rgba(99, 102, 241, 0.2)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  margin: '0 auto 12px auto'
+                  margin: '0 auto 14px auto'
                 }}>
-                  <UploadCloud size={24} color="#09090b" />
+                  <UploadCloud size={26} color="#4f46e5" />
                 </div>
 
-                <div style={{ fontSize: '14px', fontWeight: '700', color: '#09090b' }}>
+                <div style={{ fontSize: '15px', fontWeight: '800', color: '#0f172a' }}>
                   Upload Video or Photo for {clientName}
                 </div>
-                <div style={{ fontSize: '12px', color: '#71717a', margin: '4px 0 14px 0' }}>
-                  Drag &amp; drop video (MP4, MOV) or photo (JPG, PNG, WEBP) here
+                <div style={{ fontSize: '12.5px', color: '#64748b', margin: '4px 0 16px 0' }}>
+                  Drag &amp; drop MP4, MOV, WEBM, JPG, PNG or WEBP here
                 </div>
 
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  style={{ padding: '6px 16px', fontSize: '12px', backgroundColor: '#ffffff', border: '1px solid #e4e4e7' }}
+                  style={{ padding: '8px 18px', fontSize: '12.5px' }}
                   onClick={(e) => {
                     e.stopPropagation();
                     fileInputRef.current?.click();
@@ -367,8 +366,8 @@ export const ClientMediaSelector: React.FC<ClientMediaSelectorProps> = ({
                 >
                   Browse Device Storage
                 </button>
-                <div style={{ fontSize: '11px', color: '#71717a', marginTop: '12px' }}>
-                  Supports MP4, MOV, MKV, JPG, PNG, WEBP up to 250MB
+                <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '14px' }}>
+                  Maximum file size: 500 MB • Automatic HD transcoding
                 </div>
               </div>
             </div>
@@ -377,27 +376,27 @@ export const ClientMediaSelector: React.FC<ClientMediaSelectorProps> = ({
 
         {/* Right Column: Selected Media Asset Inspector */}
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <label className="form-label" style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#71717a', margin: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+            <label className="form-label" style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#64748b', margin: 0 }}>
               Selected Media Asset
             </label>
-            <span style={{ fontSize: '11px', color: '#16a34a', fontWeight: '600', backgroundColor: '#f0fdf4', padding: '2px 8px', borderRadius: '12px' }}>
-              ✓ Asset Ready for Captioning
+            <span style={{ fontSize: '11.5px', color: '#10b981', fontWeight: '600', backgroundColor: 'rgba(16, 185, 129, 0.1)', padding: '3px 9px', borderRadius: '12px' }}>
+              ✓ Asset Ready for Campaign
             </span>
           </div>
 
           {videoFilename ? (
             <div style={{
               background: '#ffffff',
-              border: '1px solid #e4e4e7',
-              borderRadius: '14px',
+              border: '1px solid #e2e8f0',
+              borderRadius: '16px',
               overflow: 'hidden',
-              boxShadow: '0 4px 18px rgba(0,0,0,0.05)'
+              boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.06)'
             }}>
               {/* Media Display Preview Box */}
               <div style={{
                 height: '240px',
-                backgroundColor: '#09090b',
+                background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
                 position: 'relative',
                 display: 'flex',
                 alignItems: 'center',
@@ -407,141 +406,145 @@ export const ClientMediaSelector: React.FC<ClientMediaSelectorProps> = ({
                 {isCurrentPhoto ? (
                   <div style={{ textAlign: 'center', color: '#ffffff', padding: '20px' }}>
                     <div style={{
-                      width: '60px',
-                      height: '60px',
+                      width: '64px',
+                      height: '64px',
                       borderRadius: '50%',
                       backgroundColor: 'rgba(255,255,255,0.15)',
+                      backdropFilter: 'blur(6px)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       margin: '0 auto 12px auto'
                     }}>
-                      <ImageIcon size={28} color="#ffffff" />
+                      <ImageIcon size={30} color="#ffffff" />
                     </div>
-                    <div style={{ fontSize: '14px', fontWeight: '700' }}>{selectedMedia?.title || videoFilename}</div>
-                    <div style={{ fontSize: '11px', opacity: 0.75, marginTop: '2px' }}>High-Resolution Photo Asset</div>
+                    <div style={{ fontSize: '14.5px', fontWeight: '700' }}>{selectedMedia?.title || videoFilename}</div>
+                    <div style={{ fontSize: '11.5px', opacity: 0.8, marginTop: '3px' }}>High-Resolution Photo Asset (1080x1080)</div>
                   </div>
                 ) : (
                   <div style={{ textAlign: 'center', color: '#ffffff' }}>
                     <div style={{
-                      width: '54px',
-                      height: '54px',
+                      width: '56px',
+                      height: '56px',
                       borderRadius: '50%',
-                      backgroundColor: 'rgba(255,255,255,0.25)',
-                      backdropFilter: 'blur(6px)',
+                      backgroundColor: 'rgba(255,255,255,0.2)',
+                      backdropFilter: 'blur(8px)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      margin: '0 auto 10px auto',
-                      cursor: 'pointer'
+                      margin: '0 auto 12px auto',
+                      boxShadow: '0 4px 14px rgba(0,0,0,0.3)'
                     }}>
-                      <Play size={22} color="#ffffff" fill="#ffffff" style={{ marginLeft: '2px' }} />
+                      <Play size={24} color="#ffffff" fill="#ffffff" style={{ marginLeft: '3px' }} />
                     </div>
-                    <div style={{ fontSize: '13px', fontWeight: '700' }}>{selectedMedia?.title || videoFilename}</div>
-                    <span style={{ fontSize: '10px', backgroundColor: 'rgba(255,255,255,0.2)', padding: '2px 8px', borderRadius: '4px', marginTop: '6px', display: 'inline-block' }}>
-                      {durationStr}
+                    <div style={{ fontSize: '14px', fontWeight: '700' }}>{selectedMedia?.title || videoFilename}</div>
+                    <span style={{ fontSize: '11px', backgroundColor: 'rgba(255,255,255,0.2)', padding: '3px 10px', borderRadius: '6px', marginTop: '8px', display: 'inline-block' }}>
+                      Duration: {durationStr}
                     </span>
                   </div>
                 )}
 
                 <span style={{
                   position: 'absolute',
-                  top: '10px',
-                  right: '10px',
-                  backgroundColor: 'rgba(0,0,0,0.75)',
+                  top: '12px',
+                  right: '12px',
+                  backgroundColor: 'rgba(15, 23, 42, 0.85)',
+                  backdropFilter: 'blur(4px)',
                   color: '#ffffff',
                   fontSize: '11px',
                   fontWeight: '700',
-                  padding: '3px 8px',
-                  borderRadius: '6px'
+                  padding: '4px 10px',
+                  borderRadius: '6px',
+                  border: '1px solid rgba(255, 255, 255, 0.15)'
                 }}>
-                  {isCurrentPhoto ? '📸 Photo' : '🎥 Video'}
+                  {isCurrentPhoto ? '📸 Photo' : '🎥 Video Reel'}
                 </span>
               </div>
 
               {/* Asset Metadata & Compatibility Details */}
-              <div style={{ padding: '18px' }}>
+              <div style={{ padding: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <div style={{ fontSize: '15px', fontWeight: '800', color: '#09090b' }}>
+                  <div style={{ fontSize: '15.5px', fontWeight: '800', color: '#0f172a' }}>
                     {selectedMedia?.title || videoFilename}
                   </div>
                   <button
                     type="button"
                     onClick={onClear}
-                    style={{ background: 'transparent', border: 'none', color: '#71717a', cursor: 'pointer', padding: '4px' }}
+                    style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px' }}
                     title="Deselect media"
                   >
                     <X size={16} />
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', fontSize: '12px', color: '#71717a', marginBottom: '14px' }}>
-                  <span>File: <strong style={{ color: '#27272a' }}>{videoFilename}</strong></span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', fontSize: '12px', color: '#64748b', marginBottom: '16px' }}>
+                  <span>File: <strong style={{ color: '#0f172a' }}>{videoFilename}</strong></span>
                   <span>•</span>
-                  <span>Size: <strong style={{ color: '#27272a' }}>{fileSizeMb} MB</strong></span>
+                  <span>Size: <strong style={{ color: '#0f172a' }}>{fileSizeMb} MB</strong></span>
                   <span>•</span>
-                  <span>Type: <strong style={{ color: '#27272a' }}>{isCurrentPhoto ? 'Photo' : 'Video'}</strong></span>
+                  <span>Type: <strong style={{ color: '#0f172a' }}>{isCurrentPhoto ? 'Photo' : 'Video'}</strong></span>
                 </div>
 
                 {/* Multi-Platform Social Compatibility */}
                 <div style={{
-                  backgroundColor: '#f8f9fa',
-                  border: '1px solid #e4e4e7',
-                  borderRadius: '10px',
-                  padding: '12px 14px',
+                  backgroundColor: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '12px',
+                  padding: '14px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '6px',
+                  gap: '8px',
                   fontSize: '12px',
-                  marginBottom: '14px'
+                  marginBottom: '16px'
                 }}>
-                  <div style={{ fontWeight: '700', color: '#09090b', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <CheckCircle2 size={14} color="#16a34a" />
-                    <span>Cross-Platform Ready:</span>
+                  <div style={{ fontWeight: '700', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <CheckCircle2 size={15} color="#10b981" />
+                    <span>Cross-Platform Readiness:</span>
                   </div>
-                  <div style={{ color: '#52525b', fontSize: '11px', lineHeight: '1.4' }}>
+                  <div style={{ color: '#475569', fontSize: '11.5px', lineHeight: '1.45' }}>
                     {isCurrentPhoto
-                      ? '✓ Optimized for Instagram Carousel/Feed, Twitter Photos, Facebook Posts & LinkedIn Updates.'
-                      : '✓ Optimized for Instagram Reels (9:16), Twitter Video Tweets, YouTube 1080p & Facebook Watch.'}
+                      ? '✓ Formatted for Instagram Feed/Carousel, Facebook Posts & LinkedIn Updates.'
+                      : '✓ Formatted for Instagram Reels (9:16), YouTube 1080p & Facebook Watch.'}
                   </div>
                 </div>
 
                 {/* Workflow Guidance Alert */}
                 <div style={{
-                  padding: '10px 14px',
-                  backgroundColor: '#f0fdf4',
-                  border: '1px solid #bbf7d0',
-                  borderRadius: '8px',
-                  fontSize: '11px',
-                  color: '#16a34a',
+                  padding: '12px 14px',
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%)',
+                  border: '1px solid rgba(16, 185, 129, 0.2)',
+                  borderRadius: '10px',
+                  fontSize: '11.5px',
+                  color: '#065f46',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
                   fontWeight: '600'
                 }}>
-                  <Sparkles size={14} color="#16a34a" />
-                  <span>Next Step: Generate tailored AI captions &amp; hashtags, then view full interactive previews!</span>
+                  <Sparkles size={15} color="#10b981" style={{ flexShrink: 0 }} />
+                  <span>Next Step: Generate tailored AI captions &amp; hashtags, then inspect full device previews!</span>
                 </div>
               </div>
             </div>
           ) : (
             <div style={{
               height: '340px',
-              border: '2px dashed #e4e4e7',
-              borderRadius: '12px',
+              border: '2px dashed #cbd5e1',
+              borderRadius: '16px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#71717a',
-              padding: '20px',
-              textAlign: 'center'
+              color: '#64748b',
+              padding: '24px',
+              textAlign: 'center',
+              backgroundColor: '#f8fafc'
             }}>
-              <Film size={38} color="#d4d4d8" style={{ marginBottom: '12px' }} />
-              <div style={{ fontSize: '14px', fontWeight: '700', color: '#27272a' }}>
+              <Film size={40} color="#94a3b8" style={{ marginBottom: '14px' }} />
+              <div style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a' }}>
                 No Media Selected Yet
               </div>
-              <p style={{ fontSize: '12px', color: '#71717a', marginTop: '4px', maxWidth: '280px', lineHeight: '1.4' }}>
+              <p style={{ fontSize: '12.5px', color: '#64748b', marginTop: '6px', maxWidth: '300px', lineHeight: '1.45' }}>
                 Select a video or photo from the library on the left or upload a file from your device.
               </p>
             </div>
@@ -556,8 +559,8 @@ export const ClientMediaSelector: React.FC<ClientMediaSelectorProps> = ({
           <button
             type="button"
             onClick={onBack}
-            className="btn btn-outline"
-            style={{ padding: '10px 18px', fontSize: '13px', gap: '8px', backgroundColor: '#ffffff', border: '1px solid #e4e4e7' }}
+            className="btn btn-secondary"
+            style={{ padding: '10px 18px', fontSize: '13px', gap: '8px' }}
           >
             <ArrowLeft size={15} />
             <span>Back to Client Selection</span>
@@ -571,10 +574,10 @@ export const ClientMediaSelector: React.FC<ClientMediaSelectorProps> = ({
               disabled={!videoFilename}
               onClick={onNext}
               className="btn btn-primary"
-              style={{ padding: '11px 22px', fontSize: '13px', gap: '8px' }}
+              style={{ padding: '11px 22px', fontSize: '13.5px', gap: '8px' }}
             >
               <span>Proceed to Captions &amp; Details</span>
-              <ArrowRight size={15} />
+              <ArrowRight size={16} />
             </button>
           )}
         </div>

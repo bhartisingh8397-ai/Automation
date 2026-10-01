@@ -37,7 +37,6 @@ interface PublishingStepProps {
     facebook: string;
     youtube: string;
     linkedin: string;
-    twitter?: string;
   };
   youtubeTitle: string;
   hashtags: string;
@@ -64,6 +63,7 @@ interface PublishingStepProps {
   onDelete?: (postId: number) => void;
   onSync?: () => void;
   isSyncing?: boolean;
+  clientAccounts?: { platform: string; is_connected?: boolean; account_handle?: string }[];
 }
 
 export const PublishingStep: React.FC<PublishingStepProps> = ({
@@ -90,21 +90,45 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
   onTimezoneChange,
   onSubmit,
   isSubmitting,
-  onBack
+  onBack,
+  clientAccounts = []
 }) => {
+  const availablePlatforms = (clientAccounts && clientAccounts.length > 0)
+    ? clientAccounts.map(a => a.platform.toLowerCase())
+    : ['instagram', 'youtube', 'facebook', 'linkedin'];
+
   const [previewPlatform, setPreviewPlatform] = useState<SocialPlatform | 'overview'>('instagram');
 
   const isPhoto = mediaType === 'photo' || videoFilename.match(/\.(jpg|jpeg|png|webp)$/i);
   const handleClean = clientName.toLowerCase().replace(/\s+/g, '');
   const handleIg = clientName.toLowerCase().replace(/\s+/g, '_');
 
-  const platformList: { id: SocialPlatform; label: string; subLabel: string }[] = [
+  const allPlatformOptions: { id: SocialPlatform; label: string; subLabel: string }[] = [
     { id: 'instagram', label: 'Instagram', subLabel: isPhoto ? 'Publish as Feed Photo / Carousel' : 'Publish as official Reel' },
-    { id: 'twitter', label: 'Twitter / X', subLabel: isPhoto ? 'Post Tweet with Photo attachment' : 'Post Tweet with Video attachment' },
     { id: 'youtube', label: 'YouTube', subLabel: isPhoto ? 'Post to Channel Community' : 'Upload directly to Channel' },
     { id: 'facebook', label: 'Facebook', subLabel: isPhoto ? 'Post Photo to Page' : 'Post to Page as Video / Reel' },
     { id: 'linkedin', label: 'LinkedIn', subLabel: isPhoto ? 'Post Image to Company' : 'Post Video to Company' }
   ];
+
+  const platformList = allPlatformOptions.filter(item => availablePlatforms.includes(item.id));
+
+  const rawPreviewTabs = [
+    { id: 'instagram' as const, label: isPhoto ? 'Instagram Photo' : 'Instagram Reel' },
+    { id: 'youtube' as const, label: isPhoto ? 'YouTube Post' : 'YouTube Video' },
+    { id: 'facebook' as const, label: 'Facebook' },
+    { id: 'linkedin' as const, label: 'LinkedIn' },
+  ].filter(item => availablePlatforms.includes(item.id));
+
+  const hasOverview = rawPreviewTabs.length > 1;
+  const previewTabs: { id: SocialPlatform | 'overview'; label: string }[] = hasOverview
+    ? [...rawPreviewTabs, { id: 'overview' as const, label: 'All Previews' }]
+    : rawPreviewTabs;
+
+  const effectivePreviewPlatform = (previewPlatform === 'overview' && hasOverview)
+    ? 'overview'
+    : (availablePlatforms.includes(previewPlatform)
+        ? previewPlatform
+        : (rawPreviewTabs[0]?.id || 'instagram'));
 
   const timezones = [
     'Asia/Kolkata (IST)',
@@ -164,15 +188,8 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
 
             {/* Platform Selector Tabs */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', overflowX: 'auto' }}>
-              {[
-                { id: 'instagram', label: isPhoto ? 'Instagram Photo' : 'Instagram Reel' },
-                { id: 'twitter', label: 'Twitter / X' },
-                { id: 'youtube', label: isPhoto ? 'YouTube Post' : 'YouTube Video' },
-                { id: 'facebook', label: 'Facebook' },
-                { id: 'linkedin', label: 'LinkedIn' },
-                { id: 'overview', label: 'All Previews' }
-              ].map(item => {
-                const isActive = previewPlatform === item.id;
+              {previewTabs.map(item => {
+                const isActive = effectivePreviewPlatform === item.id;
                 return (
                   <button
                     key={item.id}
@@ -206,7 +223,7 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
           <div style={{ padding: '24px 20px', backgroundColor: '#fafafa', minHeight: '340px' }}>
             
             {/* 1. Instagram Preview */}
-            {previewPlatform === 'instagram' && (
+            {effectivePreviewPlatform === 'instagram' && availablePlatforms.includes('instagram') && (
               <div style={{
                 maxWidth: '320px',
                 margin: '0 auto',
@@ -330,83 +347,9 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
               </div>
             )}
 
-            {/* 2. Twitter / X Tweet Preview */}
-            {previewPlatform === 'twitter' && (
-              <div style={{
-                maxWidth: '460px',
-                margin: '0 auto',
-                borderRadius: '12px',
-                backgroundColor: '#ffffff',
-                border: '1px solid #e4e4e7',
-                padding: '16px',
-                boxShadow: '0 2px 10px rgba(0,0,0,0.04)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                  <div style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: '#000000', color: '#ffffff', fontSize: '15px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {clientName.charAt(0)}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <span style={{ fontSize: '13px', fontWeight: '800', color: '#09090b' }}>{clientName}</span>
-                      <span style={{ color: '#1d9bf0', fontSize: '13px' }}>✓</span>
-                      <span style={{ fontSize: '12px', color: '#71717a' }}>@{handleClean}</span>
-                      <span style={{ fontSize: '12px', color: '#a1a1aa' }}>· Just now</span>
-                    </div>
-                  </div>
-                  <SocialIcon platform="twitter" size={18} />
-                </div>
-
-                {/* Tweet Body from Step 3 */}
-                <p style={{ fontSize: '13px', color: '#0f1419', lineHeight: '1.45', margin: '0 0 12px 0' }}>
-                  {captions.twitter || captions.general}
-                </p>
-
-                {/* Media Attachment */}
-                <div style={{ borderRadius: '12px', overflow: 'hidden', backgroundColor: '#000000', height: '210px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
-                  {mediaPreviewUrl ? (
-                    isPhoto ? (
-                      <img src={mediaPreviewUrl} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <>
-                        <video src={mediaPreviewUrl} muted loop autoPlay playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                            <Play size={20} color="#ffffff" fill="#ffffff" style={{ marginLeft: '2px' }} />
-                          </div>
-                        </div>
-                        <span style={{ position: 'absolute', bottom: '8px', right: '8px', backgroundColor: 'rgba(0,0,0,0.85)', color: '#ffffff', fontSize: '11px', fontWeight: '700', padding: '2px 6px', borderRadius: '4px' }}>{durationStr}</span>
-                      </>
-                    )
-                  ) : (
-                    isPhoto ? (
-                      <div style={{ textAlign: 'center', color: '#ffffff' }}>
-                        <ImageIcon size={32} color="#ffffff" style={{ margin: '0 auto 6px auto', display: 'block' }} />
-                        <div style={{ fontSize: '12px', fontWeight: '700' }}>{videoFilename}</div>
-                      </div>
-                    ) : (
-                      <>
-                        <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                          <Play size={20} color="#ffffff" fill="#ffffff" style={{ marginLeft: '2px' }} />
-                        </div>
-                        <span style={{ position: 'absolute', bottom: '8px', right: '8px', backgroundColor: 'rgba(0,0,0,0.85)', color: '#ffffff', fontSize: '11px', fontWeight: '700', padding: '2px 6px', borderRadius: '4px' }}>{durationStr}</span>
-                      </>
-                    )
-                  )}
-                </div>
-
-                {/* Tweet Metrics */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '8px', borderTop: '1px solid #f4f4f5', fontSize: '12px', color: '#71717a' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><MessageCircle size={14} /> 48</span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><Repeat size={14} /> 112</span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><Heart size={14} /> 890</span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><Bookmark size={14} /> 54</span>
-                  <span>📊 2.4K</span>
-                </div>
-              </div>
-            )}
 
             {/* 3. YouTube Preview */}
-            {previewPlatform === 'youtube' && (
+            {effectivePreviewPlatform === 'youtube' && availablePlatforms.includes('youtube') && (
               <div style={{
                 maxWidth: '460px',
                 margin: '0 auto',
@@ -481,7 +424,7 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
             )}
 
             {/* 4. Facebook Preview */}
-            {previewPlatform === 'facebook' && (
+            {effectivePreviewPlatform === 'facebook' && availablePlatforms.includes('facebook') && (
               <div style={{
                 maxWidth: '460px',
                 margin: '0 auto',
@@ -536,7 +479,7 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
             )}
 
             {/* 5. LinkedIn Preview */}
-            {previewPlatform === 'linkedin' && (
+            {effectivePreviewPlatform === 'linkedin' && availablePlatforms.includes('linkedin') && (
               <div style={{
                 maxWidth: '460px',
                 margin: '0 auto',
@@ -591,15 +534,16 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
             )}
 
             {/* 6. Overview (All Previews Grid) */}
-            {previewPlatform === 'overview' && (
+            {effectivePreviewPlatform === 'overview' && hasOverview && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
                 {([
                   { platform: 'instagram', label: `Instagram (${isPhoto ? 'Photo' : '9:16 Reel'})`, note: '✓ Formatted & Ready' },
-                  { platform: 'twitter', label: 'Twitter / X Post', note: '✓ 280-char Tweet Ready' },
                   { platform: 'youtube', label: 'YouTube', note: '✓ Channel Metadata Ready' },
                   { platform: 'facebook', label: 'Facebook Post', note: '✓ Page Feed Ready' },
                   { platform: 'linkedin', label: 'LinkedIn Update', note: '✓ Corporate Share Ready' }
-                ] as const).map(({ platform, label, note }) => (
+                ] as const)
+                  .filter(item => availablePlatforms.includes(item.platform))
+                  .map(({ platform, label, note }) => (
                   <div key={platform} style={{ backgroundColor: '#ffffff', border: '1px solid #e4e4e7', borderRadius: '10px', padding: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
                       <SocialIcon platform={platform} size={16} />
@@ -627,6 +571,11 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
               </div>
             )}
 
+            {availablePlatforms.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '40px 20px', color: '#71717a', fontSize: '13px' }}>
+                No connected platforms available to preview for this client.
+              </div>
+            )}
           </div>
         </div>
 
@@ -666,7 +615,12 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
 
             {/* Platform Selection Cards */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {platformList.map((item) => {
+              {platformList.length === 0 ? (
+                <div style={{ padding: '24px', textAlign: 'center', backgroundColor: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: '10px', color: '#64748b', fontSize: '13px' }}>
+                  No social media accounts configured for this client.
+                </div>
+              ) : (
+                platformList.map((item) => {
                 const isSelected = selectedPlatforms.includes(item.id);
 
                 return (
@@ -678,20 +632,20 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
                       alignItems: 'center',
                       gap: '14px',
                       padding: '14px 16px',
-                      background: isSelected ? '#f8f9fa' : '#ffffff',
-                      border: `1.5px solid ${isSelected ? '#09090b' : '#e4e4e7'}`,
+                      background: isSelected ? 'var(--rust-50)' : '#ffffff',
+                      border: `1.5px solid ${isSelected ? 'var(--accent-primary)' : 'var(--border-default)'}`,
                       borderRadius: '10px',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
-                      boxShadow: isSelected ? '0 2px 8px rgba(0,0,0,0.06)' : 'none'
+                      boxShadow: isSelected ? '0 2px 10px rgba(193, 53, 132, 0.15)' : 'none'
                     }}
                   >
                     <div style={{
                       width: '20px',
                       height: '20px',
                       borderRadius: '5px',
-                      border: `1.5px solid ${isSelected ? '#09090b' : '#d4d4d8'}`,
-                      background: isSelected ? '#09090b' : '#ffffff',
+                      border: `1.5px solid ${isSelected ? '#c13584' : 'var(--border-strong)'}`,
+                      background: isSelected ? 'linear-gradient(135deg, #833ab4, #c13584)' : '#ffffff',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -703,23 +657,42 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
                     <SocialIcon platform={item.id} size={28} />
 
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '14px', fontWeight: '700', color: '#09090b' }}>
-                        {item.label}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)' }}>
+                          {item.label}
+                        </div>
+                        {item.id === 'youtube' && (
+                          <span style={{
+                            fontSize: '10px',
+                            fontWeight: '700',
+                            padding: '2px 8px',
+                            borderRadius: '999px',
+                            background: '#dcfce7',
+                            color: '#15803d',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}>
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#16a34a' }}></span>
+                            API Connected
+                          </span>
+                        )}
                       </div>
-                      <div style={{ fontSize: '11px', color: '#71717a', marginTop: '1px' }}>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '1px' }}>
                         {item.subLabel}
                       </div>
                     </div>
+
                   </div>
                 );
-              })}
+              }))}
             </div>
           </div>
 
           {/* Right Column: Schedule Controls & Review CTA */}
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <div>
-              <label className="form-label" style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#71717a', marginBottom: '12px' }}>
+              <label className="form-label" style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', marginBottom: '12px' }}>
                 Publishing Schedule
               </label>
 
@@ -733,9 +706,9 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
                     gap: '10px',
                     padding: '12px 14px',
                     borderRadius: '8px',
-                    background: scheduleType === 'now' ? '#09090b' : '#ffffff',
-                    color: scheduleType === 'now' ? '#ffffff' : '#09090b',
-                    border: `1px solid ${scheduleType === 'now' ? '#09090b' : '#e4e4e7'}`,
+                    background: scheduleType === 'now' ? 'linear-gradient(135deg, #833ab4 0%, #c13584 100%)' : '#ffffff',
+                    color: scheduleType === 'now' ? '#ffffff' : 'var(--text-primary)',
+                    border: `1px solid ${scheduleType === 'now' ? '#833ab4' : 'var(--border-default)'}`,
                     cursor: 'pointer',
                     transition: 'all 0.15s ease'
                   }}
@@ -745,11 +718,11 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
                     name="schedule_type"
                     checked={scheduleType === 'now'}
                     onChange={() => onScheduleTypeChange('now')}
-                    style={{ accentColor: '#ffffff' }}
+                    style={{ accentColor: '#e1306c' }}
                   />
                   <div>
                     <div style={{ fontSize: '13px', fontWeight: '700' }}>Publish Now</div>
-                    <div style={{ fontSize: '10px', opacity: 0.8 }}>Immediately trigger APIs</div>
+                    <div style={{ fontSize: '10px', opacity: 0.85 }}>Immediately trigger APIs</div>
                   </div>
                 </label>
 
@@ -761,9 +734,9 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
                     gap: '10px',
                     padding: '12px 14px',
                     borderRadius: '8px',
-                    background: scheduleType === 'later' ? '#09090b' : '#ffffff',
-                    color: scheduleType === 'later' ? '#ffffff' : '#09090b',
-                    border: `1px solid ${scheduleType === 'later' ? '#09090b' : '#e4e4e7'}`,
+                    background: scheduleType === 'later' ? 'linear-gradient(135deg, #833ab4 0%, #c13584 100%)' : '#ffffff',
+                    color: scheduleType === 'later' ? '#ffffff' : 'var(--text-primary)',
+                    border: `1px solid ${scheduleType === 'later' ? '#833ab4' : 'var(--border-default)'}`,
                     cursor: 'pointer',
                     transition: 'all 0.15s ease'
                   }}
@@ -773,11 +746,11 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
                     name="schedule_type"
                     checked={scheduleType === 'later'}
                     onChange={() => onScheduleTypeChange('later')}
-                    style={{ accentColor: '#ffffff' }}
+                    style={{ accentColor: '#e1306c' }}
                   />
                   <div>
                     <div style={{ fontSize: '13px', fontWeight: '700' }}>Schedule Later</div>
-                    <div style={{ fontSize: '10px', opacity: 0.8 }}>Pick date &amp; time</div>
+                    <div style={{ fontSize: '10px', opacity: 0.85 }}>Pick date &amp; time</div>
                   </div>
                 </label>
               </div>
@@ -786,8 +759,8 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
               {scheduleType === 'later' && (
                 <div style={{
                   padding: '16px',
-                  background: '#f8f9fa',
-                  border: '1px solid #e4e4e7',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-default)',
                   borderRadius: '10px',
                   marginBottom: '18px',
                   display: 'flex',
@@ -807,7 +780,7 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
                           className="input-text"
                           style={{ fontSize: '12px', paddingLeft: '32px' }}
                         />
-                        <Calendar size={14} color="#71717a" style={{ position: 'absolute', left: '10px', top: '10px' }} />
+                        <Calendar size={14} color="var(--text-muted)" style={{ position: 'absolute', left: '10px', top: '10px' }} />
                       </div>
                     </div>
 
@@ -823,7 +796,7 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
                           className="input-text"
                           style={{ fontSize: '12px', paddingLeft: '32px' }}
                         />
-                        <Clock size={14} color="#71717a" style={{ position: 'absolute', left: '10px', top: '10px' }} />
+                        <Clock size={14} color="var(--text-muted)" style={{ position: 'absolute', left: '10px', top: '10px' }} />
                       </div>
                     </div>
                   </div>
@@ -849,22 +822,22 @@ export const PublishingStep: React.FC<PublishingStepProps> = ({
               {/* Execution Summary Box */}
               <div style={{
                 padding: '14px 16px',
-                background: '#f4f4f5',
+                background: 'var(--rust-50)',
                 borderRadius: '8px',
-                border: '1px solid #e4e4e7',
+                border: '1px solid var(--rust-100)',
                 fontSize: '12px',
-                color: '#27272a',
+                color: 'var(--text-primary)',
                 lineHeight: '1.45',
                 marginBottom: '18px'
               }}>
-                <div style={{ fontWeight: '700', marginBottom: '4px', color: '#09090b', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <CheckCircle2 size={14} color="#16a34a" />
+                <div style={{ fontWeight: '700', marginBottom: '4px', color: 'var(--accent-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <CheckCircle2 size={14} color="#e1306c" />
                   <span>Ready to Dispatch:</span>
                 </div>
                 <div>
                   Publishing <strong>{videoFilename}</strong> ({fileSizeMb} MB, {isPhoto ? 'Photo' : 'Video'}) across <strong>{selectedPlatforms.length} networks</strong> for <strong>{clientName}</strong>.
                 </div>
-                <div style={{ marginTop: '4px', fontSize: '11px', color: '#71717a' }}>
+                <div style={{ marginTop: '4px', fontSize: '11px', color: 'var(--text-muted)' }}>
                   {scheduleType === 'now' ? 'Instant execution via live OAuth APIs.' : `Scheduled for ${scheduleDate} at ${scheduleTime} (${timezone}).`}
                 </div>
               </div>

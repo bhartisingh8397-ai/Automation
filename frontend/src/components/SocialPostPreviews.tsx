@@ -13,7 +13,6 @@ interface SocialPostPreviewsProps {
     facebook: string;
     youtube: string;
     linkedin: string;
-    twitter?: string;
   };
   youtubeTitle: string;
   hashtags: string;
@@ -31,7 +30,6 @@ export const SocialPostPreviews: React.FC<SocialPostPreviewsProps> = ({
   const fbCaption = captions.facebook || captions.general || 'खरखौदा में ब्लड बैंक की सुविधा अब और भी बेहतर! Keshav Hospital में सुरक्षित, आधुनिक और 24x7 ब्लड बैंक सेवा उपलब्ध है...';
   const ytTitle = youtubeTitle || `खरखौदा में ब्लड बैंक की सुविधा | ${displayClient}`;
   const liCaption = captions.linkedin || captions.general || `${displayClient} is proud to announce expanded 24x7 advanced blood banking facilities in Kharkhoda, ensuring rapid response emergency care.`;
-  const twCaption = captions.twitter || captions.general || `🚨 24x7 ब्लड बैंक सुविधा अब ${displayClient} में उपलब्ध! सुरक्षित व आधुनिक सेवा। 🏥 #BloodBank #${displayClient.replace(/\s+/g, '')}`;
 
   return (
     <div style={{ marginTop: '24px' }}>
@@ -314,92 +312,6 @@ export const SocialPostPreviews: React.FC<SocialPostPreviewsProps> = ({
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', paddingTop: '8px', borderTop: '1px solid #e4e4e7', fontSize: '11px', color: '#71717a' }}>
               <span>👏 184 • 14 comments</span>
               <span>1,200 impressions</span>
-            </div>
-          </div>
-        </div>
-
-        {/* 5. Twitter / X Video Tweet Preview */}
-        <div style={{
-          background: '#ffffff',
-          border: '1px solid #e4e4e7',
-          borderRadius: 'var(--radius-md)',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-        }}>
-          {/* Header */}
-          <div style={{ padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #e4e4e7', background: '#f8f9fa' }}>
-            <SocialIcon platform="twitter" size={18} />
-            <span style={{ fontSize: '12px', fontWeight: '700', color: '#09090b' }}>Twitter / X Post</span>
-          </div>
-
-          <div style={{ padding: '14px' }}>
-            {/* Account row */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#000000', color: '#fff', fontSize: '12px', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {displayClient.charAt(0)}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#09090b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {displayClient}
-                  </span>
-                  <span style={{ color: '#1d9bf0', fontSize: '12px' }}>✓</span>
-                  <span style={{ fontSize: '11px', color: '#71717a' }}>
-                    @{displayClient.toLowerCase().replace(/\s+/g, '')}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Tweet body */}
-            <p style={{ fontSize: '11px', color: '#0f1419', marginBottom: '8px', lineHeight: '1.4', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-              {twCaption}
-            </p>
-
-            {/* Video preview container */}
-            <div style={{
-              height: '130px',
-              background: '#000000',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative'
-            }}>
-              <div style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.25)',
-                backdropFilter: 'blur(4px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <Play size={18} color="#ffffff" fill="#ffffff" />
-              </div>
-              <span style={{
-                position: 'absolute',
-                bottom: '6px',
-                right: '6px',
-                background: 'rgba(0,0,0,0.75)',
-                color: '#ffffff',
-                fontSize: '9px',
-                padding: '1px 5px',
-                borderRadius: '3px'
-              }}>
-                2:15
-              </span>
-            </div>
-
-            {/* Tweet action metrics */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', paddingTop: '8px', borderTop: '1px solid #e4e4e7', fontSize: '11px', color: '#71717a' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}><MessageCircle size={12} /> 42</span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}><Repeat size={12} /> 128</span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}><Heart size={12} /> 890</span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}><Bookmark size={12} /> 64</span>
             </div>
           </div>
         </div>

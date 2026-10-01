@@ -13,8 +13,12 @@ import {
   Film, 
   FileText, 
   Send,
-  BarChart3
+  BarChart3,
+  Server,
+  Layers,
+  ChevronRight
 } from 'lucide-react';
+import { SocialIcon } from './SocialIcons';
 
 interface SidebarProps {
   dbInfo: DatabaseInfo | null;
@@ -29,6 +33,7 @@ interface SidebarProps {
   currentStep?: number;
   onStepChange?: (step: number) => void;
   selectedClientName?: string;
+  selectedClientAccounts?: { platform: string }[];
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -42,24 +47,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
   postsCount = 0,
   currentStep = 1,
   onStepChange,
-  selectedClientName
+  selectedClientName,
+  selectedClientAccounts = []
 }) => {
   const steps = [
-    { num: 1, title: 'Select Client & Socials', icon: Users },
-    { num: 2, title: 'Select Media & Preview', icon: Film },
-    { num: 3, title: 'Captions & AI Details', icon: FileText },
-    { num: 4, title: 'Choose Platforms & Post', icon: Send },
+    { num: 1, title: 'Client & Socials', icon: Users },
+    { num: 2, title: 'Media & Preview', icon: Film },
+    { num: 3, title: 'Captions & AI', icon: FileText },
+    { num: 4, title: 'Platforms & Post', icon: Send },
   ];
 
   return (
     <aside style={{
-      width: '270px',
-      minWidth: '270px',
+      width: '272px',
+      minWidth: '272px',
       height: '100vh',
       position: 'sticky',
       top: 0,
       background: '#ffffff',
-      borderRight: '1px solid #e4e4e7',
+      borderRight: '1px solid var(--border-default)',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
@@ -77,41 +83,42 @@ export const Sidebar: React.FC<SidebarProps> = ({
           alignItems: 'center',
           gap: '12px',
           paddingBottom: '20px',
-          borderBottom: '1px solid #f4f4f5'
+          borderBottom: '1px solid var(--border-subtle)'
         }}>
           <div style={{
-            width: '38px',
-            height: '38px',
-            backgroundColor: '#09090b',
-            borderRadius: '9px',
+            width: '40px',
+            height: '40px',
+            background: 'linear-gradient(135deg, #833ab4 0%, #c13584 45%, #e1306c 75%, #f77737 100%)',
+            borderRadius: '10px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontWeight: '900',
-            fontSize: '19px',
+            fontFamily: 'var(--font-headings)',
+            fontWeight: '700',
+            fontSize: '20px',
             color: '#ffffff',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
+            boxShadow: '0 4px 14px rgba(193, 53, 132, 0.32)',
             flexShrink: 0
           }}>
             D
           </div>
-          <div>
+          <div style={{ minWidth: 0 }}>
             <h1 style={{
-              fontSize: '20px',
-              fontWeight: '800',
+              fontSize: '18px',
+              fontWeight: '700',
               letterSpacing: '-0.02em',
-              color: '#09090b',
-              fontFamily: 'var(--font-serif)',
+              color: 'var(--text-primary)',
+              fontFamily: 'var(--font-headings)',
               margin: 0,
               lineHeight: 1.15
             }}>
               Digigyapan
             </h1>
             <div style={{
-              fontSize: '11px',
-              fontWeight: '600',
-              color: '#71717a',
-              letterSpacing: '0.04em',
+              fontSize: '10.5px',
+              fontWeight: '700',
+              color: 'var(--accent-primary)',
+              letterSpacing: '0.05em',
               textTransform: 'uppercase',
               marginTop: '2px'
             }}>
@@ -120,64 +127,129 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        {/* Primary Navigation */}
-        <div style={{ marginTop: '24px' }}>
+        {/* Selected Client Pill Card */}
+        {selectedClientName && (
           <div style={{
-            fontSize: '11px',
+            margin: '16px 0 14px',
+            padding: '10px 12px',
+            borderRadius: '10px',
+            background: 'var(--rust-50)',
+            border: '1px solid var(--rust-100)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: '700', color: 'var(--accent-primary)', letterSpacing: '0.05em' }}>
+                Active Client
+              </div>
+              <div style={{
+                fontSize: '13px',
+                fontWeight: '700',
+                color: 'var(--text-primary)',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                marginTop: '1px'
+              }}>
+                {selectedClientName}
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '3px', alignItems: 'center' }}>
+              {selectedClientAccounts && selectedClientAccounts.length > 0 ? (
+                selectedClientAccounts.map(acc => (
+                  <SocialIcon key={acc.platform} platform={acc.platform} size={13} />
+                ))
+              ) : (
+                <span style={{ fontSize: '10px', color: 'var(--text-dim)' }}>None</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* SECTION 1: WORKSPACE / CAMPAIGN STUDIO */}
+        <div style={{ marginTop: '16px' }}>
+          <div style={{
+            fontSize: '10.5px',
             fontWeight: '700',
             textTransform: 'uppercase',
             letterSpacing: '0.06em',
-            color: '#a1a1aa',
-            marginBottom: '8px',
+            color: 'var(--text-dim)',
+            marginBottom: '6px',
             paddingLeft: '8px'
           }}>
-            Main Navigation
+            Campaign Studio
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            
-            {/* Create Post */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <button
               type="button"
-              onClick={() => {
-                onViewChange('create');
-              }}
+              onClick={() => onViewChange('create')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '10px 14px',
-                borderRadius: '8px',
-                border: 'none',
-                background: activeView === 'create' ? '#09090b' : 'transparent',
-                color: activeView === 'create' ? '#ffffff' : '#3f3f46',
+                padding: '9px 12px',
+                borderRadius: '9px',
+                border: `1px solid ${activeView === 'create' ? 'var(--rust-100)' : 'transparent'}`,
+                background: activeView === 'create' ? 'var(--rust-50)' : 'transparent',
+                color: activeView === 'create' ? 'var(--accent-secondary)' : 'var(--text-secondary)',
                 fontSize: '13px',
-                fontWeight: '600',
+                fontWeight: activeView === 'create' ? '700' : '550',
                 cursor: 'pointer',
                 textAlign: 'left',
                 width: '100%',
-                transition: 'all 0.15s ease',
-                boxShadow: activeView === 'create' ? '0 2px 6px rgba(0,0,0,0.1)' : 'none'
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => {
+                if (activeView !== 'create') {
+                  e.currentTarget.style.background = 'var(--bg-secondary)';
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeView !== 'create') {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                }
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <PenSquare size={16} />
-                <span>Create Post</span>
+                <PenSquare size={15} />
+                <span>Create Campaign</span>
               </div>
               {activeView === 'create' && (
                 <span style={{
                   fontSize: '10px',
                   fontWeight: '700',
-                  padding: '2px 6px',
-                  borderRadius: '9999px',
-                  backgroundColor: '#ffffff',
-                  color: '#09090b'
+                  padding: '2px 7px',
+                  borderRadius: '999px',
+                  background: 'linear-gradient(135deg, #833ab4, #c13584)',
+                  color: '#ffffff'
                 }}>
                   Step {currentStep}/4
                 </span>
               )}
             </button>
+          </div>
+        </div>
 
+        {/* SECTION 2: INTELLIGENCE & ARCHIVE */}
+        <div style={{ marginTop: '18px' }}>
+          <div style={{
+            fontSize: '10.5px',
+            fontWeight: '700',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            color: 'var(--text-dim)',
+            marginBottom: '6px',
+            paddingLeft: '8px'
+          }}>
+            Intelligence &amp; Archive
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            
             {/* Analytics Dashboard */}
             <button
               type="button"
@@ -186,31 +258,42 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '10px 14px',
-                borderRadius: '8px',
-                border: 'none',
-                background: activeView === 'analytics' ? '#09090b' : 'transparent',
-                color: activeView === 'analytics' ? '#ffffff' : '#3f3f46',
+                padding: '9px 12px',
+                borderRadius: '9px',
+                border: `1px solid ${activeView === 'analytics' ? 'var(--rust-100)' : 'transparent'}`,
+                background: activeView === 'analytics' ? 'var(--rust-50)' : 'transparent',
+                color: activeView === 'analytics' ? 'var(--accent-secondary)' : 'var(--text-secondary)',
                 fontSize: '13px',
-                fontWeight: '600',
+                fontWeight: activeView === 'analytics' ? '700' : '550',
                 cursor: 'pointer',
                 textAlign: 'left',
                 width: '100%',
-                transition: 'all 0.15s ease',
-                boxShadow: activeView === 'analytics' ? '0 2px 6px rgba(0,0,0,0.1)' : 'none'
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => {
+                if (activeView !== 'analytics') {
+                  e.currentTarget.style.background = 'var(--bg-secondary)';
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeView !== 'analytics') {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                }
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <BarChart3 size={16} />
-                <span>Analytics &amp; Metrics</span>
+                <BarChart3 size={15} />
+                <span>Analytics &amp; Reach</span>
               </div>
               <span style={{
                 fontSize: '10px',
                 fontWeight: '700',
-                padding: '2px 6px',
-                borderRadius: '9999px',
-                backgroundColor: activeView === 'analytics' ? '#27272a' : '#f0fdf4',
-                color: activeView === 'analytics' ? '#ffffff' : '#16a34a'
+                padding: '2px 7px',
+                borderRadius: '999px',
+                backgroundColor: activeView === 'analytics' ? '#e1306c' : 'var(--sand-200)',
+                color: activeView === 'analytics' ? '#ffffff' : 'var(--text-muted)'
               }}>
                 Live
               </span>
@@ -224,32 +307,43 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '10px 14px',
-                borderRadius: '8px',
-                border: 'none',
-                background: activeView === 'history' ? '#09090b' : 'transparent',
-                color: activeView === 'history' ? '#ffffff' : '#3f3f46',
+                padding: '9px 12px',
+                borderRadius: '9px',
+                border: `1px solid ${activeView === 'history' ? 'var(--rust-100)' : 'transparent'}`,
+                background: activeView === 'history' ? 'var(--rust-50)' : 'transparent',
+                color: activeView === 'history' ? 'var(--accent-secondary)' : 'var(--text-secondary)',
                 fontSize: '13px',
-                fontWeight: '600',
+                fontWeight: activeView === 'history' ? '700' : '550',
                 cursor: 'pointer',
                 textAlign: 'left',
                 width: '100%',
-                transition: 'all 0.15s ease',
-                boxShadow: activeView === 'history' ? '0 2px 6px rgba(0,0,0,0.1)' : 'none'
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => {
+                if (activeView !== 'history') {
+                  e.currentTarget.style.background = 'var(--bg-secondary)';
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeView !== 'history') {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                }
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <History size={16} />
+                <History size={15} />
                 <span>Post History</span>
               </div>
               {postsCount > 0 && (
                 <span style={{
-                  fontSize: '11px',
+                  fontSize: '10px',
                   fontWeight: '700',
-                  padding: '2px 8px',
-                  borderRadius: '9999px',
-                  backgroundColor: activeView === 'history' ? '#27272a' : '#f4f4f5',
-                  color: activeView === 'history' ? '#ffffff' : '#09090b'
+                  padding: '2px 7px',
+                  borderRadius: '999px',
+                  backgroundColor: activeView === 'history' ? '#c13584' : 'var(--sand-200)',
+                  color: activeView === 'history' ? '#ffffff' : 'var(--text-muted)'
                 }}>
                   {postsCount}
                 </span>
@@ -259,42 +353,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        {/* Workflow Steps (Direct Quick-Jumper in Sidebar) */}
+        {/* SECTION 3: WORKFLOW PIPELINE (When on create campaign view) */}
         {activeView === 'create' && onStepChange && (
-          <div style={{ marginTop: '24px' }}>
+          <div style={{ marginTop: '20px' }}>
             <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: '8px',
+              fontSize: '10.5px',
+              fontWeight: '700',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              color: 'var(--text-dim)',
+              marginBottom: '6px',
               paddingLeft: '8px'
             }}>
-              <span style={{
-                fontSize: '11px',
-                fontWeight: '700',
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
-                color: '#a1a1aa'
-              }}>
-                Workflow Steps
-              </span>
-              {selectedClientName && (
-                <span style={{
-                  fontSize: '10px',
-                  color: '#71717a',
-                  maxWidth: '110px',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }} title={selectedClientName}>
-                  {selectedClientName}
-                </span>
-              )}
+              Pipeline Stages
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
               {steps.map(step => {
-                const Icon = step.icon;
                 const isActive = currentStep === step.num;
                 const isPassed = currentStep > step.num;
 
@@ -306,12 +381,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '10px',
-                      padding: '8px 12px',
+                      gap: '9px',
+                      padding: '7px 10px',
                       borderRadius: '8px',
-                      border: `1px solid ${isActive ? '#09090b' : 'transparent'}`,
-                      background: isActive ? '#f4f4f5' : 'transparent',
-                      color: isActive ? '#09090b' : (isPassed ? '#27272a' : '#71717a'),
+                      border: `1px solid ${isActive ? 'var(--rust-100)' : 'transparent'}`,
+                      background: isActive ? 'var(--rust-50)' : 'transparent',
+                      color: isActive ? 'var(--accent-secondary)' : (isPassed ? 'var(--text-primary)' : 'var(--text-muted)'),
                       fontSize: '12px',
                       fontWeight: isActive ? '700' : '500',
                       cursor: 'pointer',
@@ -319,13 +394,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       width: '100%',
                       transition: 'all 0.15s ease'
                     }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.background = 'var(--bg-secondary)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.background = 'transparent';
+                      }
+                    }}
                   >
                     <div style={{
                       width: '20px',
                       height: '20px',
                       borderRadius: '50%',
-                      backgroundColor: isActive ? '#09090b' : (isPassed ? '#16a34a' : '#e4e4e7'),
-                      color: '#ffffff',
+                      backgroundColor: isActive ? 'var(--accent-primary)' : (isPassed ? 'var(--accent-secondary)' : 'var(--sand-200)'),
+                      color: isPassed || isActive ? '#ffffff' : 'var(--text-muted)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -347,42 +432,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       </div>
 
-      {/* Bottom Block: System Utilities + User Account + Logout */}
-      <div style={{ paddingTop: '20px', borderTop: '1px solid #f4f4f5', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        
-        {/* Sync Database Button */}
-        {onSync && (
-          <button
-            type="button"
-            onClick={onSync}
-            disabled={isSyncing}
-            className="btn btn-outline"
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              padding: '8px 12px',
-              borderRadius: '8px',
-              backgroundColor: '#ffffff',
-              border: '1px solid #e4e4e7',
-              color: '#09090b',
-              fontSize: '12px',
-              fontWeight: '600'
-            }}
-            title="Sync posts and client database"
-          >
-            <RefreshCw size={13} className={isSyncing ? 'animate-spin' : ''} />
-            <span>{isSyncing ? 'Syncing...' : 'Sync Database'}</span>
-          </button>
-        )}
+      {/* Bottom Block: User Account */}
+      <div style={{ paddingTop: '16px', borderTop: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
 
         {/* User Profile Card */}
         <div style={{
-          padding: '12px',
-          background: '#f8f9fa',
-          border: '1px solid #e4e4e7',
+          padding: '9px 12px',
+          background: '#ffffff',
+          border: '1px solid var(--border-default)',
           borderRadius: '9px',
           display: 'flex',
           alignItems: 'center',
@@ -391,30 +448,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
             <div style={{
-              width: '32px',
-              height: '32px',
+              width: '30px',
+              height: '30px',
               borderRadius: '8px',
-              backgroundColor: '#09090b',
+              background: 'linear-gradient(135deg, #833ab4 0%, #c13584 100%)',
               color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              fontFamily: 'var(--font-headings)',
+              fontWeight: '700',
+              fontSize: '12px',
               flexShrink: 0
             }}>
-              <UserCheck size={16} />
+              DG
             </div>
             <div style={{ minWidth: 0 }}>
               <div style={{
                 fontSize: '12px',
                 fontWeight: '700',
-                color: '#09090b',
+                color: 'var(--text-primary)',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
               }} title={userEmail}>
                 {userEmail}
               </div>
-              <div style={{ fontSize: '10px', color: '#71717a' }}>
+              <div style={{ fontSize: '10px', color: 'var(--text-dim)', fontWeight: '500' }}>
                 Administrator
               </div>
             </div>
@@ -428,16 +488,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 background: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
-                padding: '6px',
+                padding: '5px',
                 borderRadius: '6px',
-                color: '#71717a',
+                color: 'var(--text-dim)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                transition: 'color 0.15s ease'
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#c13584')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-dim)')}
               title="Logout"
             >
-              <LogOut size={15} />
+              <LogOut size={14} />
             </button>
           )}
         </div>

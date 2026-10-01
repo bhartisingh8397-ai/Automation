@@ -9,7 +9,6 @@ export interface ClientSocialLinks {
   instagram?: string;
   youtube?: string;
   linkedin?: string;
-  twitter?: string;
 }
 
 interface AddClientModalProps {
@@ -29,7 +28,6 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
   const [instagram, setInstagram] = useState('');
   const [youtube, setYoutube] = useState('');
   const [linkedin, setLinkedin] = useState('');
-  const [twitter, setTwitter] = useState('');
   const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
@@ -43,15 +41,13 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
         facebook: facebook.trim(),
         instagram: instagram.trim(),
         youtube: youtube.trim(),
-        linkedin: linkedin.trim(),
-        twitter: twitter.trim()
+        linkedin: linkedin.trim()
       });
       setName('');
       setFacebook('');
       setInstagram('');
       setYoutube('');
       setLinkedin('');
-      setTwitter('');
       onClose();
     } finally {
       setLoading(false);
@@ -75,19 +71,20 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
               width: '34px',
               height: '34px',
               borderRadius: '8px',
-              backgroundColor: '#09090b',
+              background: 'linear-gradient(135deg, #833ab4 0%, #c13584 100%)',
               color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              boxShadow: '0 2px 8px rgba(193, 53, 132, 0.25)'
             }}>
               <Building2 size={18} />
             </div>
             <div>
-              <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#09090b', margin: 0, fontFamily: 'var(--font-serif)' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)', margin: 0, fontFamily: 'var(--font-serif)' }}>
                 Add New Client Organization
               </h3>
-              <p style={{ fontSize: '12px', color: '#71717a', margin: '2px 0 0 0' }}>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '2px 0 0 0' }}>
                 Register client details and their social media channels
               </p>
             </div>
@@ -230,22 +227,6 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
                   placeholder={`e.g. linkedin.com/company/${nameSlug}`}
                   value={linkedin}
                   onChange={(e) => setLinkedin(e.target.value)}
-                />
-              </div>
-
-              {/* Twitter / X */}
-              <div>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: '600', color: '#27272a', marginBottom: '5px' }}>
-                  <SocialIcon platform="twitter" size={16} />
-                  <span>Twitter / X Profile / Handle</span>
-                </label>
-                <input
-                  type="text"
-                  className="input-text"
-                  style={{ fontSize: '12px', padding: '8px 10px', background: '#ffffff' }}
-                  placeholder={`e.g. @${nameSlug} or x.com/${nameSlug}`}
-                  value={twitter}
-                  onChange={(e) => setTwitter(e.target.value)}
                 />
               </div>
             </div>

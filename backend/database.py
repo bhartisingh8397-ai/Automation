@@ -129,7 +129,6 @@ def seed_data_if_needed():
                 SocialAccount(client_id=keshav.id, platform="instagram", account_name="Keshav Hospital", account_handle="@keshav_hospital", page_id="ig_act_904328", is_connected=True),
                 SocialAccount(client_id=keshav.id, platform="youtube", account_name="Keshav Hospital Official", account_handle="@keshavhospital", page_id="yt_ch_872346", is_connected=True),
                 SocialAccount(client_id=keshav.id, platform="linkedin", account_name="Keshav Hospital", account_handle="keshav-hospital-official", page_id="li_org_389247", is_connected=True),
-                SocialAccount(client_id=keshav.id, platform="twitter", account_name="Keshav Hospital on X", account_handle="@keshavhospital", page_id="tw_acc_109823", is_connected=True),
             ]
             
             # Social Accounts for Roshni Dental
@@ -138,7 +137,6 @@ def seed_data_if_needed():
                 SocialAccount(client_id=roshni.id, platform="instagram", account_name="Roshni Dental", account_handle="@roshnidental_care", page_id="ig_act_204329", is_connected=True),
                 SocialAccount(client_id=roshni.id, platform="youtube", account_name="Roshni Dental", account_handle="@roshnidental", page_id="yt_ch_272341", is_connected=True),
                 SocialAccount(client_id=roshni.id, platform="linkedin", account_name="Roshni Dental Care", account_handle="roshni-dental", page_id="li_org_289241", is_connected=True),
-                SocialAccount(client_id=roshni.id, platform="twitter", account_name="Roshni Dental Care", account_handle="@roshnidental", page_id="tw_acc_209823", is_connected=True),
             ]
 
             # Social Accounts for Noble Hospital
@@ -147,7 +145,6 @@ def seed_data_if_needed():
                 SocialAccount(client_id=noble.id, platform="instagram", account_name="Noble Hospital", account_handle="@noble_hospital", page_id="ig_act_304329", is_connected=True),
                 SocialAccount(client_id=noble.id, platform="youtube", account_name="Noble Hospital Healthcare", account_handle="@noblehospital", page_id="yt_ch_372341", is_connected=True),
                 SocialAccount(client_id=noble.id, platform="linkedin", account_name="Noble Hospital", account_handle="noble-hospital", page_id="li_org_389241", is_connected=True),
-                SocialAccount(client_id=noble.id, platform="twitter", account_name="Noble Hospital on X", account_handle="@noblehospital", page_id="tw_acc_309823", is_connected=True),
             ]
 
             # Social Accounts for Dermatrixx
@@ -156,7 +153,6 @@ def seed_data_if_needed():
                 SocialAccount(client_id=dermatrixx.id, platform="instagram", account_name="Dermatrixx", account_handle="@dermatrixx_skin", page_id="ig_act_404329", is_connected=True),
                 SocialAccount(client_id=dermatrixx.id, platform="youtube", account_name="Dermatrixx Clinic", account_handle="@dermatrixx", page_id="yt_ch_472341", is_connected=True),
                 SocialAccount(client_id=dermatrixx.id, platform="linkedin", account_name="Dermatrixx Aesthetics", account_handle="dermatrixx-clinic", page_id="li_org_489241", is_connected=True),
-                SocialAccount(client_id=dermatrixx.id, platform="twitter", account_name="Dermatrixx Clinic", account_handle="@dermatrixx", page_id="tw_acc_409823", is_connected=True),
             ]
             
             session.add_all(keshav_accounts + roshni_accounts + noble_accounts + dermatrixx_accounts)
@@ -177,7 +173,6 @@ def seed_data_if_needed():
                 caption_facebook="खरखौदा में ब्लड बैंक की सुविधा अब और भी बेहतर! Keshav Hospital में सुरक्षित, आधुनिक और 24x7 ब्लड बैंक सेवा उपलब्ध है...",
                 caption_youtube="खरखौदा में ब्लड बैंक की सुविधा | Keshav Hospital Kharkhoda 24x7 Blood Bank Facility",
                 caption_linkedin="Keshav Hospital is proud to announce expanded 24x7 advanced blood banking facilities in Kharkhoda, ensuring rapid response emergency care.",
-                caption_twitter="खरखौदा में 24x7 ब्लड बैंक की सुविधा! Keshav Hospital में सुरक्षित व आधुनिक रक्त सेवा उपलब्ध है। 🩸🏥 #BloodBank #KeshavHospital",
                 youtube_title="खरखौदा में ब्लड बैंक की सुविधा | Keshav Hospital",
                 hashtags="#BloodBank #KeshavHospital #HealthCare #Kharkhoda #EmergencyCare",
                 schedule_type="later",
@@ -189,11 +184,10 @@ def seed_data_if_needed():
             session.commit()
             
             session.add_all([
-                PostPlatform(post_id=post1.id, platform="instagram", post_type="Reel", status="Published", platform_post_id="reel_ig_9812401", platform_post_url="https://instagram.com/reel/C89218xKeshav", published_at=now - timedelta(days=1)),
-                PostPlatform(post_id=post1.id, platform="facebook", post_type="Video/Reel", status="Published", platform_post_id="fb_vid_5419827", platform_post_url="https://facebook.com/keshavhospital/videos/5419827", published_at=now - timedelta(days=1)),
-                PostPlatform(post_id=post1.id, platform="youtube", post_type="Video", status="Published", platform_post_id="yt_vid_K8h92_1v", platform_post_url="https://youtube.com/watch?v=K8h92_1v", published_at=now - timedelta(days=1)),
-                PostPlatform(post_id=post1.id, platform="linkedin", post_type="Video", status="Published", platform_post_id="li_urn_891724", platform_post_url="https://linkedin.com/feed/update/urn:li:activity:891724", published_at=now - timedelta(days=1)),
-                PostPlatform(post_id=post1.id, platform="twitter", post_type="Video Tweet", status="Published", platform_post_id="tw_18920148", platform_post_url="https://x.com/keshavhospital/status/18920148", published_at=now - timedelta(days=1)),
+                PostPlatform(post_id=post1.id, platform="instagram", post_type="Reel", status="Published", platform_post_id="reel_ig_9812401", platform_post_url="https://www.instagram.com/keshav_hospital/", published_at=now - timedelta(days=1)),
+                PostPlatform(post_id=post1.id, platform="facebook", post_type="Video/Reel", status="Published", platform_post_id="fb_vid_5419827", platform_post_url="https://www.facebook.com/keshavhospital", published_at=now - timedelta(days=1)),
+                PostPlatform(post_id=post1.id, platform="youtube", post_type="Video", status="Published", platform_post_id="yt_vid_wJINj8w85JA", platform_post_url="https://www.youtube.com/@bhartisingh-e9h/videos", published_at=now - timedelta(days=1)),
+                PostPlatform(post_id=post1.id, platform="linkedin", post_type="Video", status="Published", platform_post_id="li_urn_891724", platform_post_url="https://www.linkedin.com/company/keshav-hospital-official", published_at=now - timedelta(days=1)),
             ])
             
             # Post 2: dental-care.mp4 (Scheduled)
@@ -208,7 +202,6 @@ def seed_data_if_needed():
                 caption_facebook="अपनी मुस्कान को दें नया निखार! Roshni Dental Clinic में आधुनिक लेजर दांत सफाई और रूट कैनाल ट्रीटमेंट उपलब्ध है।",
                 caption_youtube="आधुनिक लेजर दांत सफाई | Complete Dental Care by Roshni Dental Clinic",
                 caption_linkedin="Delivering premier cosmetic dentistry and painless root canal treatments at Roshni Dental Clinic.",
-                caption_twitter="अपनी मुस्कान को दें नया निखार! Roshni Dental Clinic में आधुनिक लेज़र दांत सफ़ाई उपलब्ध। ✨🦷 #DentalCare #RoshniDental",
                 youtube_title="आधुनिक लेजर दांत सफाई | Roshni Dental Clinic",
                 hashtags="#DentalCare #SmileCare #Dentist #OralHealth",
                 schedule_type="later",
@@ -220,11 +213,10 @@ def seed_data_if_needed():
             session.commit()
             
             session.add_all([
-                PostPlatform(post_id=post2.id, platform="instagram", post_type="Reel", status="Pending"),
-                PostPlatform(post_id=post2.id, platform="facebook", post_type="Video/Reel", status="Pending"),
-                PostPlatform(post_id=post2.id, platform="youtube", post_type="Video", status="Pending"),
-                PostPlatform(post_id=post2.id, platform="linkedin", post_type="Video", status="Pending"),
-                PostPlatform(post_id=post2.id, platform="twitter", post_type="Video Tweet", status="Pending"),
+                PostPlatform(post_id=post2.id, platform="instagram", post_type="Reel", status="Pending", platform_post_url="https://www.instagram.com/roshnidental_care/"),
+                PostPlatform(post_id=post2.id, platform="facebook", post_type="Video/Reel", status="Pending", platform_post_url="https://www.facebook.com/roshnidental"),
+                PostPlatform(post_id=post2.id, platform="youtube", post_type="Video", status="Pending", platform_post_url="https://www.youtube.com/@bhartisingh-e9h/videos"),
+                PostPlatform(post_id=post2.id, platform="linkedin", post_type="Video", status="Pending", platform_post_url="https://www.linkedin.com/company/roshni-dental"),
             ])
 
             # Post 3: diabetes.mp4 (Partially Failed)
@@ -239,7 +231,6 @@ def seed_data_if_needed():
                 caption_facebook="डायबिटीज को करें नियंत्रित! Noble Hospital के विशेषज्ञ डॉक्टरों की सलाह और नियमित चेकअप से स्वस्थ रहें।",
                 caption_youtube="मधुमेह प्रबंधन और आहार सलाह | Noble Hospital Diabetes Care",
                 caption_linkedin="Noble Hospital launches holistic metabolic health and diabetes management program.",
-                caption_twitter="डायबिटीज को करें नियंत्रित! Noble Hospital के विशेषज्ञ डॉक्टरों की सलाह व चेकअप। 🩺💙 #DiabetesCare #NobleHospital",
                 youtube_title="मधुमेह प्रबंधन और आहार सलाह | Noble Hospital",
                 hashtags="#DiabetesCare #HealthTips #NobleHospital #Wellness",
                 schedule_type="later",
@@ -251,11 +242,10 @@ def seed_data_if_needed():
             session.commit()
             
             session.add_all([
-                PostPlatform(post_id=post3.id, platform="instagram", post_type="Reel", status="Published", platform_post_id="reel_ig_498210", platform_post_url="https://instagram.com/reel/D91834xNoble", published_at=now - timedelta(days=2)),
-                PostPlatform(post_id=post3.id, platform="facebook", post_type="Video/Reel", status="Published", platform_post_id="fb_vid_891024", platform_post_url="https://facebook.com/noblehospital/videos/891024", published_at=now - timedelta(days=2)),
-                PostPlatform(post_id=post3.id, platform="youtube", post_type="Video", status="Failed", error_message="Daily upload quota exceeded for YouTube Data API v3. Retry available."),
-                PostPlatform(post_id=post3.id, platform="linkedin", post_type="Video", status="Published", platform_post_id="li_urn_728910", platform_post_url="https://linkedin.com/feed/update/urn:li:activity:728910", published_at=now - timedelta(days=2)),
-                PostPlatform(post_id=post3.id, platform="twitter", post_type="Video Tweet", status="Published", platform_post_id="tw_18920149", platform_post_url="https://x.com/noblehospital/status/18920149", published_at=now - timedelta(days=2)),
+                PostPlatform(post_id=post3.id, platform="instagram", post_type="Reel", status="Published", platform_post_id="reel_ig_498210", platform_post_url="https://www.instagram.com/noble_hospital/", published_at=now - timedelta(days=2)),
+                PostPlatform(post_id=post3.id, platform="facebook", post_type="Video/Reel", status="Published", platform_post_id="fb_vid_891024", platform_post_url="https://www.facebook.com/noblehospital", published_at=now - timedelta(days=2)),
+                PostPlatform(post_id=post3.id, platform="youtube", post_type="Video", status="Failed", error_message="Daily upload quota exceeded for YouTube Data API v3. Retry available.", platform_post_url="https://www.youtube.com/@bhartisingh-e9h/videos"),
+                PostPlatform(post_id=post3.id, platform="linkedin", post_type="Video", status="Published", platform_post_id="li_urn_728910", platform_post_url="https://www.linkedin.com/company/noble-hospital", published_at=now - timedelta(days=2)),
             ])
 
             # Post 4: hair-care.mp4 (Failed)
@@ -270,7 +260,6 @@ def seed_data_if_needed():
                 caption_facebook="बालों के झड़ने से परेशान? Dermatrixx Clinic में एडवांस PRP और हेयर रीग्रोथ थेरेपी से पाएं घने बाल।",
                 caption_youtube="एडवांस हेयर रीग्रोथ थेरेपी और PRP | Dermatrixx Clinic",
                 caption_linkedin="Cutting-edge hair restoration and regenerative PRP therapies now available at Dermatrixx Clinic.",
-                caption_twitter="बालों के झड़ने से परेशान? Dermatrixx Clinic में एडवांस PRP थेरेपी। 💆‍♂️✨ #HairCare #Dermatrixx",
                 youtube_title="एडवांस हेयर रीग्रोथ थेरेपी | Dermatrixx Clinic",
                 hashtags="#HairRestoration #PRPTreatment #Dermatrixx #Aesthetics",
                 schedule_type="later",
@@ -286,7 +275,6 @@ def seed_data_if_needed():
                 PostPlatform(post_id=post4.id, platform="facebook", post_type="Video/Reel", status="Failed", error_message="Facebook Page access token expired. Please re-authenticate."),
                 PostPlatform(post_id=post4.id, platform="youtube", post_type="Video", status="Failed", error_message="Channel verification required for video longer than 15 mins."),
                 PostPlatform(post_id=post4.id, platform="linkedin", post_type="Video", status="Failed", error_message="OAuth token renewal required."),
-                PostPlatform(post_id=post4.id, platform="twitter", post_type="Video Tweet", status="Failed", error_message="X API write permission authentication failed."),
             ])
 
             # Automation step logs for post 1
