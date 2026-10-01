@@ -32,13 +32,26 @@ class LinkedInService:
     @staticmethod
     def get_stored_tokens():
         path = LinkedInService._get_token_path()
+        tokens = None
         if os.path.exists(path):
             try:
                 with open(path, "r", encoding="utf-8") as f:
-                    return json.load(f)
+                    tokens = json.load(f)
             except Exception:
-                return None
-        return None
+                tokens = None
+
+        if not tokens and getattr(Config, 'LINKEDIN_ACCESS_TOKEN', None) and Config.LINKEDIN_ACCESS_TOKEN.strip():
+            access_token = Config.LINKEDIN_ACCESS_TOKEN.strip()
+            author_info = LinkedInService.fetch_author_info(access_token)
+            if author_info:
+                tokens = {
+                    "access_token": access_token,
+                    "author": author_info,
+                    "saved_at": time.time()
+                }
+                LinkedInService.save_tokens(tokens)
+
+        return tokens
 
     @staticmethod
     def save_tokens(tokens):

@@ -34,13 +34,52 @@ class MetaService:
     @staticmethod
     def get_stored_tokens():
         path = MetaService._get_token_path()
+        tokens = None
         if os.path.exists(path):
             try:
                 with open(path, "r", encoding="utf-8") as f:
-                    return json.load(f)
+                    tokens = json.load(f)
             except Exception:
-                return None
-        return None
+                tokens = None
+
+        if not tokens and Config.META_ACCESS_TOKEN and Config.META_ACCESS_TOKEN.strip():
+            try:
+                res = requests.get(f"{MetaService.GRAPH_BASE_URL}/me/accounts?access_token={Config.META_ACCESS_TOKEN.strip()}", timeout=8)
+                if res.status_code == 200:
+                    pages_data = res.json().get("data", [])
+                    pages = []
+                    ig_accounts = []
+                    for p in pages_data:
+                        pages.append({
+                            "id": p.get("id"),
+                            "name": p.get("name"),
+                            "access_token": p.get("access_token")
+                        })
+                        try:
+                            ig_res = requests.get(f"{MetaService.GRAPH_BASE_URL}/{p.get('id')}?fields=instagram_business_account{{id,username,name}}&access_token={p.get('access_token')}", timeout=6)
+                            if ig_res.status_code == 200:
+                                ig_data = ig_res.json().get("instagram_business_account")
+                                if ig_data:
+                                    ig_accounts.append({
+                                        "id": ig_data.get("id"),
+                                        "username": ig_data.get("username"),
+                                        "name": ig_data.get("name"),
+                                        "page_id": p.get("id"),
+                                        "page_access_token": p.get("access_token")
+                                    })
+                        except Exception:
+                            pass
+                    tokens = {
+                        "user_access_token": Config.META_ACCESS_TOKEN.strip(),
+                        "pages": pages,
+                        "instagram_accounts": ig_accounts,
+                        "saved_at": time.time()
+                    }
+                    MetaService.save_tokens(tokens)
+            except Exception as e:
+                print(f"[MetaService] Failed to auto-resolve META_ACCESS_TOKEN: {e}")
+
+        return tokens
 
     @staticmethod
     def save_tokens(tokens):

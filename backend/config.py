@@ -44,6 +44,7 @@ class Config:
     LINKEDIN_CLIENT_ID = os.getenv("LINKEDIN_CLIENT_ID", "")
     LINKEDIN_CLIENT_SECRET = os.getenv("LINKEDIN_CLIENT_SECRET", "")
     LINKEDIN_REDIRECT_URI = os.getenv("LINKEDIN_REDIRECT_URI", "http://localhost:5000/api/linkedin/oauth2callback")
+    LINKEDIN_ACCESS_TOKEN = os.getenv("LINKEDIN_ACCESS_TOKEN", "")
     LINKEDIN_TOKEN_FILE = BASE_DIR / "linkedin_tokens.json"
 
     # OpenAI / Open API Configuration
