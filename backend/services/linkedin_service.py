@@ -224,9 +224,15 @@ class LinkedInService:
 
         if not clean_handle:
             clean_handle = post.client.name.replace(" ", "").lower() if post.client else "digigyapan"
-            clean_handle = clean_handle.replace("https://", "").replace("http://", "").strip("/")
-            if "/" in clean_handle:
-                clean_handle = clean_handle.split("/")[-1]
+
+        if clean_handle:
+            clean_handle = clean_handle.replace("https://", "").replace("http://", "").replace("www.", "").strip("/")
+            if "linkedin.com/company/" in clean_handle:
+                clean_handle = clean_handle.split("linkedin.com/company/")[-1]
+            elif "linkedin.com/in/" in clean_handle:
+                clean_handle = clean_handle.split("linkedin.com/in/")[-1]
+            elif "linkedin.com/" in clean_handle:
+                clean_handle = clean_handle.split("linkedin.com/")[-1]
 
         # Prepare caption and commentary
         caption = (post.caption_linkedin or post.caption_general or "").strip()

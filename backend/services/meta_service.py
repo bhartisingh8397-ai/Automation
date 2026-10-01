@@ -268,9 +268,12 @@ class MetaService:
 
         if not clean_handle:
             clean_handle = post.client.name.replace(" ", "").lower() if post.client else "digigyapan"
-            clean_handle = clean_handle.replace("https://", "").replace("http://", "").strip("/")
-            if "/" in clean_handle:
-                clean_handle = clean_handle.split("/")[-1]
+
+        # Sanitize handle - remove any URL prefixes
+        if clean_handle:
+            clean_handle = clean_handle.replace("https://", "").replace("http://", "").replace("www.", "").strip("/")
+            if "facebook.com/" in clean_handle:
+                clean_handle = clean_handle.split("facebook.com/")[-1]
 
         # Match connected page by name or ID if available
         if pages:
@@ -369,9 +372,11 @@ class MetaService:
 
         if not clean_handle:
             clean_handle = post.client.name.replace(" ", "").lower() if post.client else "digigyapan"
-            clean_handle = clean_handle.replace("https://", "").replace("http://", "").strip("/")
-            if "/" in clean_handle:
-                clean_handle = clean_handle.split("/")[-1]
+
+        if clean_handle:
+            clean_handle = clean_handle.replace("https://", "").replace("http://", "").replace("www.", "").strip("/")
+            if "instagram.com/" in clean_handle:
+                clean_handle = clean_handle.split("instagram.com/")[-1]
 
         target_ig = None
         if ig_accounts:
