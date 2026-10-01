@@ -40,6 +40,12 @@ class Config:
     META_ACCESS_TOKEN = os.getenv("META_ACCESS_TOKEN", "")
     META_TOKEN_FILE = BASE_DIR / "meta_tokens.json"
 
+    # LinkedIn Developer API & OAuth Credentials
+    LINKEDIN_CLIENT_ID = os.getenv("LINKEDIN_CLIENT_ID", "")
+    LINKEDIN_CLIENT_SECRET = os.getenv("LINKEDIN_CLIENT_SECRET", "")
+    LINKEDIN_REDIRECT_URI = os.getenv("LINKEDIN_REDIRECT_URI", "http://localhost:5000/api/linkedin/oauth2callback")
+    LINKEDIN_TOKEN_FILE = BASE_DIR / "linkedin_tokens.json"
+
     
     @classmethod
     def get_mysql_uri(cls):

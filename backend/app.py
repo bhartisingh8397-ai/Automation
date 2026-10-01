@@ -10,6 +10,7 @@ from routes.ai import ai_bp
 from routes.logs import logs_bp
 from routes.youtube import youtube_bp
 from routes.meta import meta_bp
+from routes.linkedin import linkedin_bp
 
 def create_app():
     app = Flask(__name__)
@@ -29,6 +30,7 @@ def create_app():
     app.register_blueprint(logs_bp, url_prefix='/api/logs')
     app.register_blueprint(youtube_bp, url_prefix='/api/youtube')
     app.register_blueprint(meta_bp, url_prefix='/api/meta')
+    app.register_blueprint(linkedin_bp, url_prefix='/api/linkedin')
 
 
     @app.route('/api/health', methods=['GET'])

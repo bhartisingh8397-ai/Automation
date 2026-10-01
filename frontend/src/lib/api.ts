@@ -187,6 +187,34 @@ export const api = {
     const res = await fetch(`${API_BASE}/meta/disconnect`, { method: 'POST' });
     if (!res.ok) throw new Error('Failed to disconnect Meta');
     return res.json();
+  },
+
+  async getLinkedInStatus(checkLive: boolean = false): Promise<{
+    configured: boolean;
+    client_id?: string;
+    masked_client_id?: string;
+    credentials_valid: boolean;
+    client_error?: string;
+    authenticated: boolean;
+    author?: { sub: string; name: string; email?: string; picture?: string };
+    redirect_uri: string;
+    auth_url?: string;
+  }> {
+    const res = await fetch(`${API_BASE}/linkedin/status?check_live=${checkLive}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch LinkedIn status');
+    return res.json();
+  },
+
+  async testLinkedIn(): Promise<any> {
+    const res = await fetch(`${API_BASE}/linkedin/test`, { method: 'POST' });
+    if (!res.ok) throw new Error('Failed to test LinkedIn connection');
+    return res.json();
+  },
+
+  async disconnectLinkedIn(): Promise<any> {
+    const res = await fetch(`${API_BASE}/linkedin/disconnect`, { method: 'POST' });
+    if (!res.ok) throw new Error('Failed to disconnect LinkedIn');
+    return res.json();
   }
 };
 

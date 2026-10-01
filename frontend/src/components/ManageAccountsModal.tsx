@@ -29,6 +29,7 @@ export const ManageAccountsModal: React.FC<ManageAccountsModalProps> = ({
   const [systemYtChannel, setSystemYtChannel] = useState<string | null>(null);
   const [systemFbPage, setSystemFbPage] = useState<string | null>(null);
   const [systemIgAccount, setSystemIgAccount] = useState<string | null>(null);
+  const [systemLinkedInAuthor, setSystemLinkedInAuthor] = useState<string | null>(null);
 
   useEffect(() => {
     if (client) {
@@ -68,6 +69,15 @@ export const ManageAccountsModal: React.FC<ManageAccountsModalProps> = ({
         }
         if (res.instagram_accounts && res.instagram_accounts.length > 0) {
           setSystemIgAccount(res.instagram_accounts[0].username);
+        }
+      })
+      .catch(() => {});
+
+    // Check system's connected LinkedIn author
+    api.getLinkedInStatus(false)
+      .then(res => {
+        if (res.author?.name) {
+          setSystemLinkedInAuthor(res.author.name);
         }
       })
       .catch(() => {});
@@ -311,6 +321,31 @@ export const ManageAccountsModal: React.FC<ManageAccountsModalProps> = ({
                           background: '#fdf2f8',
                           border: '1px solid #fce7f3',
                           color: '#be185d',
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          fontSize: '10.5px',
+                          fontWeight: '700',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        + Use This Profile
+                      </button>
+                    </div>
+                  )}
+
+                  {/* LinkedIn Shortcut: Use Connected LinkedIn Profile */}
+                  {p.key === 'linkedin' && systemLinkedInAuthor && currentValue !== systemLinkedInAuthor && (
+                    <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '11px', color: '#15803d' }}>
+                        ✓ LinkedIn: <strong>{systemLinkedInAuthor}</strong>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setLinks(prev => ({ ...prev, linkedin: systemLinkedInAuthor }))}
+                        style={{
+                          background: '#f0fdf4',
+                          border: '1px solid #dcfce7',
+                          color: '#15803d',
                           padding: '3px 8px',
                           borderRadius: '6px',
                           fontSize: '10.5px',

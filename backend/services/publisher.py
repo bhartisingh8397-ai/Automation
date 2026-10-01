@@ -5,6 +5,7 @@ from models import Post, PostPlatform, AutomationLog
 from database import SessionLocal
 from services.youtube_service import YouTubeService
 from services.meta_service import MetaService
+from services.linkedin_service import LinkedInService
 
 class PlatformPublisher:
     """
@@ -158,10 +159,8 @@ class PlatformPublisher:
             return True, channel_url, f"yt_ch_{rand_id}", None
 
         elif platform == "linkedin":
-            # Genuine LinkedIn organization or profile
-            url = f"https://www.linkedin.com/company/{clean_handle}"
-            post_id = f"li_{rand_id}"
-            return True, url, post_id, None
+            # Real LinkedIn UGC Post API / Share publishing
+            return LinkedInService.publish_post(post, post_platform)
 
         return False, None, None, f"Unsupported platform: {platform}"
 
