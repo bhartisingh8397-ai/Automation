@@ -184,11 +184,23 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
             <div className="form-group" style={{ position: 'relative' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                 <label className="form-label" style={{ margin: 0 }}>
-                  {activeTab === 'general' ? 'Main Caption' : `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Caption`}
+                  {activeTab === 'general' ? 'Main Caption (Syncs to All Platforms)' : `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Caption`}
                 </label>
-                <span style={{ fontSize: '11px', color: charCount > currentLimit ? '#ef4444' : 'var(--text-dim)' }}>
-                  {charCount}/{currentLimit}
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {currentText && (
+                    <button
+                      type="button"
+                      onClick={() => onCaptionChange(activeTab, '')}
+                      style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '11px', fontWeight: '600', cursor: 'pointer', padding: 0 }}
+                      title="Clear this caption"
+                    >
+                      Clear
+                    </button>
+                  )}
+                  <span style={{ fontSize: '11px', color: charCount > currentLimit ? '#ef4444' : 'var(--text-dim)' }}>
+                    {charCount}/{currentLimit}
+                  </span>
+                </div>
               </div>
 
               <textarea
@@ -196,12 +208,17 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
                 rows={6}
                 placeholder={
                   activeTab === 'general'
-                    ? "Enter your primary caption here. It will be synced across all connected platforms..."
+                    ? "Type your caption here. Whatever you write here will be published to all selected social media platforms..."
                     : `Enter custom caption for ${activeTab}...`
                 }
                 value={currentText}
                 onChange={(e) => onCaptionChange(activeTab, e.target.value)}
               />
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                {activeTab === 'general'
+                  ? '✓ Whatever you fill in this column is published across all platforms.'
+                  : `Custom caption for ${activeTab.toUpperCase()}.`}
+              </div>
             </div>
 
             {/* AI Generator Trigger */}

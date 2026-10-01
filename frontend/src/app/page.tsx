@@ -46,15 +46,15 @@ export default function Home() {
 
   // Step 3 Captions State
   const [captions, setCaptions] = useState({
-    general: 'खरखौदा में ब्लड बैंक की सुविधा अब और भी बेहतर! Keshav Hospital में सुरक्षित, आधुनिक और 24x7 ब्लड बैंक सेवा उपलब्ध है...',
-    instagram: 'खरखौदा में ब्लड बैंक की सुविधा अब और भी बेहतर! Keshav Hospital में सुरक्षित, आधुनिक और 24x7 ब्लड बैंक सेवा उपलब्ध है। #BloodBank #KeshavHospital #Healthcare',
-    facebook: 'खरखौदा में ब्लड बैंक की सुविधा अब और भी बेहतर! Keshav Hospital में सुरक्षित, आधुनिक और 24x7 ब्लड बैंक सेवा उपलब्ध है...',
-    youtube: 'खरखौदा में ब्लड बैंक की सुविधा | Keshav Hospital Kharkhoda 24x7 Blood Bank Facility\n\nEmergency helpline: +91 98765 43210\nWebsite: www.keshavhospital.com',
-    linkedin: 'Keshav Hospital is proud to announce expanded 24x7 advanced blood banking facilities in Kharkhoda, ensuring rapid response emergency care.'
+    general: '',
+    instagram: '',
+    facebook: '',
+    youtube: '',
+    linkedin: ''
   });
 
-  const [youtubeTitle, setYoutubeTitle] = useState('खरखौदा में ब्लड बैंक की सुविधा | Keshav Hospital');
-  const [hashtags, setHashtags] = useState('#BloodBank #KeshavHospital #HealthCare #EmergencyCare');
+  const [youtubeTitle, setYoutubeTitle] = useState('');
+  const [hashtags, setHashtags] = useState('');
 
   // Step 4 Platform Selection
   const [selectedPlatforms, setSelectedPlatforms] = useState<SocialPlatform[]>([
@@ -287,6 +287,17 @@ export default function Home() {
     const mediaDuration = isImage ? 'Photo (1080x1080)' : '1:30';
     setDurationStr(mediaDuration);
 
+    // Reset captions so user can fill their own custom caption for this upload
+    setCaptions({
+      general: '',
+      instagram: '',
+      facebook: '',
+      youtube: '',
+      linkedin: ''
+    });
+    setYoutubeTitle(file.name.replace(/\.[^/.]+$/, ""));
+    setHashtags('');
+
     setIsUploading(true);
     try {
       const res = await api.uploadVideo(file, mediaDuration);
@@ -481,19 +492,25 @@ export default function Home() {
       ? `${scheduleDate}T${scheduleTime}:00`
       : new Date().toISOString();
 
+    const filledCaption = (captions.general || '').trim();
+    const igCap = (captions.instagram && captions.instagram.trim()) ? captions.instagram.trim() : filledCaption;
+    const fbCap = (captions.facebook && captions.facebook.trim()) ? captions.facebook.trim() : filledCaption;
+    const ytCap = (captions.youtube && captions.youtube.trim()) ? captions.youtube.trim() : filledCaption;
+    const liCap = (captions.linkedin && captions.linkedin.trim()) ? captions.linkedin.trim() : filledCaption;
+
     const payload = {
       client_id: selectedClientId,
       video_filename: videoFilename,
       video_url: `/api/posts/media/${videoFilename}`,
       file_size_mb: fileSizeMb,
       duration_str: durationStr,
-      caption_general: captions.general,
-      caption_instagram: captions.instagram,
-      caption_facebook: captions.facebook,
-      caption_youtube: captions.youtube,
-      caption_linkedin: captions.linkedin,
-      youtube_title: youtubeTitle,
-      hashtags: hashtags,
+      caption_general: filledCaption,
+      caption_instagram: igCap,
+      caption_facebook: fbCap,
+      caption_youtube: ytCap,
+      caption_linkedin: liCap,
+      youtube_title: youtubeTitle.trim() || filledCaption.slice(0, 80),
+      hashtags: hashtags.trim(),
       schedule_type: scheduleType,
       scheduled_at: scheduledDateTime,
       timezone: timezone,
@@ -1091,7 +1108,19 @@ export default function Home() {
                 captions={captions}
                 youtubeTitle={youtubeTitle}
                 hashtags={hashtags}
-                onCaptionChange={(plat, text) => setCaptions(prev => ({ ...prev, [plat]: text }))}
+                onCaptionChange={(plat, text) => {
+                  if (plat === 'general') {
+                    setCaptions({
+                      general: text,
+                      instagram: text,
+                      facebook: text,
+                      youtube: text,
+                      linkedin: text
+                    });
+                  } else {
+                    setCaptions(prev => ({ ...prev, [plat]: text }));
+                  }
+                }}
                 onYoutubeTitleChange={setYoutubeTitle}
                 onHashtagsChange={setHashtags}
                 onGenerateAi={handleGenerateAi}

@@ -251,9 +251,7 @@ class YouTubeService:
         if len(title) > 95:
             title = title[:92] + "..."
             
-        description = post.caption_youtube or post.caption_general or ""
-        if post.hashtags and post.hashtags not in description:
-            description = f"{description}\n\n{post.hashtags}"
+        description = (post.caption_youtube or post.caption_general or "").strip()
 
         tags = [t.strip("#").strip() for t in (post.hashtags or "").split() if t.strip()]
 

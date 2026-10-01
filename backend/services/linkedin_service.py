@@ -229,9 +229,7 @@ class LinkedInService:
                 clean_handle = clean_handle.split("/")[-1]
 
         # Prepare caption and commentary
-        caption = post.caption_linkedin or post.caption_general or ""
-        if post.hashtags and post.hashtags not in caption:
-            caption = f"{caption}\n\n{post.hashtags}"
+        caption = (post.caption_linkedin or post.caption_general or "").strip()
 
         # 1. Live LinkedIn UGC Post API publishing if authorized
         if access_token and author_sub:

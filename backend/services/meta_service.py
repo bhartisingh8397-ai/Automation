@@ -281,9 +281,7 @@ class MetaService:
             if not target_page:
                 target_page = pages[0]  # Default to primary connected page
 
-        caption = post.caption_facebook or post.caption_general or ""
-        if post.hashtags and post.hashtags not in caption:
-            caption = f"{caption}\n\n{post.hashtags}"
+        caption = (post.caption_facebook or post.caption_general or "").strip()
 
         is_photo = (getattr(post, "media_type", None) == "photo") or (
             post.video_filename and post.video_filename.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.gif'))
@@ -384,9 +382,7 @@ class MetaService:
             if not target_ig:
                 target_ig = ig_accounts[0]
 
-        caption = post.caption_instagram or post.caption_general or ""
-        if post.hashtags and post.hashtags not in caption:
-            caption = f"{caption}\n\n{post.hashtags}"
+        caption = (post.caption_instagram or post.caption_general or "").strip()
 
         is_photo = (getattr(post, "media_type", None) == "photo") or (
             post.video_filename and post.video_filename.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.gif'))
