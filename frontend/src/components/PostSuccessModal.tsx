@@ -87,17 +87,19 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
   function resolvePlatformLink(plat: SocialPlatform, rawUrl?: string | null, status?: string): { url: string; label: string; isRealVideo: boolean } {
     const handle = getAccountHandle(plat).replace(/\s+/g, '').replace(/^https?:\/\/[^/]+\/?/, '').replace(/\/$/, '');
 
+    // If rawUrl is provided by backend (e.g. from Meta, YouTube, or LinkedIn publish)
+    if (rawUrl && (rawUrl.startsWith('http://') || rawUrl.startsWith('https://'))) {
+      return {
+        url: rawUrl,
+        label: `View Post`,
+        isRealVideo: true
+      };
+    }
+
     if (plat === 'youtube') {
-      if (rawUrl && (rawUrl.includes('watch?v=') || rawUrl.includes('youtu.be/')) && !rawUrl.includes('wJINj8w85JA') && !rawUrl.includes('yt_vid_K8h92_1v')) {
-        return {
-          url: rawUrl,
-          label: 'Watch Video on YouTube',
-          isRealVideo: true
-        };
-      }
       return {
         url: `${REAL_YOUTUBE_CHANNEL}/videos`,
-        label: 'View YouTube Channel',
+        label: 'View Post on YouTube',
         isRealVideo: false
       };
     }
@@ -105,7 +107,7 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
     if (plat === 'instagram') {
       return {
         url: `https://www.instagram.com/${handle}/`,
-        label: 'View Instagram Profile',
+        label: 'View Post on Instagram',
         isRealVideo: false
       };
     }
@@ -113,7 +115,7 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
     if (plat === 'facebook') {
       return {
         url: `https://www.facebook.com/${handle}`,
-        label: 'View Facebook Page',
+        label: 'View Post on Facebook',
         isRealVideo: false
       };
     }
@@ -121,14 +123,14 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
     if (plat === 'linkedin') {
       return {
         url: `https://www.linkedin.com/company/${handle}`,
-        label: 'View LinkedIn Page',
+        label: 'View Post on LinkedIn',
         isRealVideo: false
       };
     }
 
     return {
       url: `https://${plat}.com/${handle}`,
-      label: `View ${plat}`,
+      label: `View Post on ${plat}`,
       isRealVideo: false
     };
   }
@@ -163,6 +165,8 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
   const anyFailed = platformsToDisplay.some(p => p.status === 'Failed');
   const allFailed = platformsToDisplay.length > 0 && platformsToDisplay.every(p => p.status === 'Failed');
   const allPublished = platformsToDisplay.length > 0 && platformsToDisplay.every(p => p.status === 'Published');
+  const primaryPlatform = platformsToDisplay.find(p => p.status === 'Published' && p.url) || platformsToDisplay[0];
+  const primaryPostUrl = primaryPlatform?.url;
 
   // Trigger confetti only when publish succeeded without complete failure
   useEffect(() => {
@@ -362,29 +366,53 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
             )}
           </p>
 
-          {/* Replay Confetti Button (if successful) */}
-          {!allFailed && (
-            <button
-              type="button"
-              onClick={fireConfetti}
-              style={{
-                marginTop: '10px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '4px 12px',
-                fontSize: '11px',
-                fontWeight: '600',
-                color: '#16a34a',
-                backgroundColor: '#f0fdf4',
-                border: '1px solid #bbf7d0',
-                borderRadius: '20px',
-                cursor: 'pointer'
-              }}
-            >
-              <Sparkles size={12} />
-              <span>Celebrate Again 🎊</span>
-            </button>
+          {/* Hero Action: View Post Button */}
+          {primaryPostUrl && !allFailed && (
+            <div style={{ marginTop: '14px', display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <a
+                href={primaryPostUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: '#09090b',
+                  color: '#ffffff',
+                  padding: '11px 24px',
+                  borderRadius: '12px',
+                  fontSize: '13.5px',
+                  fontWeight: '700',
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2)',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <ExternalLink size={16} />
+                <span>View Post ({primaryPlatform.platform.toUpperCase()})</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={fireConfetti}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '11px 16px',
+                  fontSize: '12.5px',
+                  fontWeight: '600',
+                  color: '#16a34a',
+                  backgroundColor: '#f0fdf4',
+                  border: '1px solid #bbf7d0',
+                  borderRadius: '12px',
+                  cursor: 'pointer'
+                }}
+              >
+                <Sparkles size={14} />
+                <span>Celebrate 🎊</span>
+              </button>
+            </div>
           )}
 
           {/* Retry Success Banner */}
@@ -617,19 +645,20 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
                         rel="noopener noreferrer"
                         className="btn btn-primary"
                         style={{
-                          padding: '6px 14px',
+                          padding: '7px 14px',
                           fontSize: '12px',
-                          fontWeight: '600',
+                          fontWeight: '700',
                           gap: '6px',
                           textDecoration: 'none',
                           display: 'inline-flex',
                           alignItems: 'center',
                           backgroundColor: isFailed ? '#71717a' : '#09090b',
                           color: '#ffffff',
-                          borderRadius: '6px'
+                          borderRadius: '8px',
+                          boxShadow: isFailed ? 'none' : '0 2px 6px rgba(0,0,0,0.12)'
                         }}
                       >
-                        <span>{item.buttonLabel}</span>
+                        <span>{item.buttonLabel || 'View Post'}</span>
                         <ExternalLink size={13} />
                       </a>
                     </div>
@@ -675,26 +704,37 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
           gap: '10px',
           marginTop: '22px',
           paddingTop: '16px',
-          borderTop: '1px solid #e4e4e7'
+          borderTop: '1px solid #e4e4e7',
+          flexWrap: 'wrap'
         }}>
-          <button
-            type="button"
-            onClick={onViewHistory}
-            className="btn btn-outline"
-            style={{
-              flex: 1,
-              padding: '10px 14px',
-              fontSize: '13px',
-              gap: '6px',
-              backgroundColor: '#ffffff',
-              border: '1px solid #e4e4e7',
-              color: '#09090b',
-              fontWeight: '600'
-            }}
-          >
-            <History size={15} />
-            <span>Go to Post History</span>
-          </button>
+          {primaryPostUrl && !allFailed && (
+            <a
+              href={primaryPostUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary"
+              style={{
+                flex: 1,
+                minWidth: '130px',
+                padding: '10px 14px',
+                fontSize: '13px',
+                gap: '6px',
+                backgroundColor: '#2563eb',
+                borderColor: '#2563eb',
+                color: '#ffffff',
+                fontWeight: '700',
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '8px',
+                boxShadow: '0 2px 8px rgba(37,99,235,0.25)'
+              }}
+            >
+              <ExternalLink size={15} />
+              <span>View Post</span>
+            </a>
+          )}
 
           <button
             type="button"
@@ -702,16 +742,39 @@ export const PostSuccessModal: React.FC<PostSuccessModalProps> = ({
             className="btn btn-primary"
             style={{
               flex: 1,
+              minWidth: '130px',
               padding: '10px 14px',
               fontSize: '13px',
               gap: '6px',
               backgroundColor: '#09090b',
               color: '#ffffff',
-              fontWeight: '600'
+              fontWeight: '600',
+              borderRadius: '8px'
             }}
           >
             <PlusCircle size={15} />
-            <span>Publish Another Video</span>
+            <span>Publish Another</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onViewHistory}
+            className="btn btn-outline"
+            style={{
+              flex: 1,
+              minWidth: '130px',
+              padding: '10px 14px',
+              fontSize: '13px',
+              gap: '6px',
+              backgroundColor: '#ffffff',
+              border: '1px solid #e4e4e7',
+              color: '#09090b',
+              fontWeight: '600',
+              borderRadius: '8px'
+            }}
+          >
+            <History size={15} />
+            <span>Post History</span>
           </button>
         </div>
 

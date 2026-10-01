@@ -348,17 +348,17 @@ export const ViewLinksModal: React.FC<ViewLinksModalProps> = ({ post, onClose })
 
                         {/* Action Buttons */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          {/* Real video link if available */}
-                          {resolved.videoUrl && (
+                          {/* Direct View Post link if available */}
+                          {(platform.platform_post_url || resolved.videoUrl) && (
                             <a
-                              href={resolved.videoUrl}
+                              href={platform.platform_post_url || resolved.videoUrl!}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="btn btn-outline"
-                              style={{ padding: '6px 12px', fontSize: '12px', gap: '4px', color: '#dc2626', borderColor: 'rgba(220,38,38,0.3)' }}
-                              title="Watch directly on YouTube"
+                              className="btn btn-primary"
+                              style={{ padding: '6px 12px', fontSize: '12px', gap: '4px', backgroundColor: '#2563eb', borderColor: '#2563eb', color: '#ffffff', textDecoration: 'none', borderRadius: '8px', fontWeight: '700' }}
+                              title="View live post"
                             >
-                              <span>Watch Video</span>
+                              <span>View Post</span>
                               <ExternalLink size={12} />
                             </a>
                           )}
@@ -368,14 +368,15 @@ export const ViewLinksModal: React.FC<ViewLinksModalProps> = ({ post, onClose })
                             href={resolved.channelUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="btn btn-primary"
+                            className="btn btn-outline"
                             style={{
                               padding: '6px 14px',
                               fontSize: '12px',
                               fontWeight: '600',
                               gap: '6px',
-                              backgroundColor: isFailed ? '#71717a' : '#09090b',
-                              color: '#ffffff',
+                              backgroundColor: '#ffffff',
+                              border: '1px solid #e4e4e7',
+                              color: isFailed ? '#71717a' : '#09090b',
                               borderRadius: '8px',
                               textDecoration: 'none'
                             }}

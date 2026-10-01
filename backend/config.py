@@ -46,6 +46,8 @@ class Config:
     LINKEDIN_REDIRECT_URI = os.getenv("LINKEDIN_REDIRECT_URI", "http://localhost:5000/api/linkedin/oauth2callback")
     LINKEDIN_TOKEN_FILE = BASE_DIR / "linkedin_tokens.json"
 
+    # OpenAI / Open API Configuration
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "") or os.getenv("OPEN_API_KEY", "")
     
     @classmethod
     def get_mysql_uri(cls):

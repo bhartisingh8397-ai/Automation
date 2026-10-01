@@ -1,11 +1,14 @@
 import os
 import json
 import random
+import requests
+from config import Config
 
 class AIGenerator:
     """
     Smart Content & Caption Generator tailored for healthcare, business, and social media.
     Supports platform-specific formatting and character limits.
+    Connects to real AI API (OpenAI / Open API Key) when configured, with high-quality fallback.
     """
     
     TEMPLATES = {
@@ -51,6 +54,53 @@ class AIGenerator:
 
     @classmethod
     def generate(cls, topic, client_name="Our Organization", business_type="General", language="hi_en"):
+        api_key = Config.OPENAI_API_KEY
+        if api_key and api_key.strip():
+            try:
+                prompt = (
+                    f"Create engaging, high-converting social media captions in natural Hindi/Hinglish/English for:\n"
+                    f"Client: {client_name}\n"
+                    f"Business Type: {business_type}\n"
+                    f"Topic/Highlight: {topic}\n\n"
+                    f"Respond ONLY with a valid JSON object matching these exact keys:\n"
+                    f'{{\n'
+                    f'  "caption_general": "Universal caption suitable for all platforms",\n'
+                    f'  "caption_instagram": "Engaging, emoji-rich reel/post caption with hashtags",\n'
+                    f'  "caption_facebook": "Community-oriented detailed post with call to action",\n'
+                    f'  "caption_youtube": "Detailed YouTube video description with timestamps",\n'
+                    f'  "caption_linkedin": "Professional, executive tone post",\n'
+                    f'  "youtube_title": "Catchy YouTube video title under 90 characters",\n'
+                    f'  "hashtags": "#Tag1 #Tag2 #Tag3 #Tag4 #Tag5"\n'
+                    f'}}'
+                )
+
+                headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {api_key.strip()}"
+                }
+                payload = {
+                    "model": "gpt-4o-mini",
+                    "messages": [
+                        {"role": "system", "content": "You are a professional social media marketing copywriter. Return ONLY valid JSON."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    "temperature": 0.7
+                }
+                res = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload, timeout=6)
+                if res.status_code == 200:
+                    raw_content = res.json()["choices"][0]["message"]["content"].strip()
+                    if raw_content.startswith("```"):
+                        raw_content = raw_content.split("```")[1]
+                        if raw_content.startswith("json"):
+                            raw_content = raw_content[4:].strip()
+                    parsed = json.loads(raw_content)
+                    tags = parsed.get("hashtags", "").split()
+                    parsed["hashtags_list"] = tags
+                    return parsed
+            except Exception as e:
+                print(f"[AIGenerator] API call error or fallback to templates: {e}")
+
+        # Fallback to smart template generator
         # Determine category
         b_lower = business_type.lower()
         if "dental" in b_lower:
